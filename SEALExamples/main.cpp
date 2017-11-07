@@ -1089,6 +1089,8 @@ void example_batching()
     cout << "Encrypting: ";
     encryptor.encrypt(plain_matrix, encrypted_matrix);
     cout << "Done" << endl;
+    cout << "Noise budget in fresh encryption: "
+        << decryptor.invariant_noise_budget(encrypted_matrix) << " bits" << endl;
 
     /*
     Operating on the ciphertext results in homomorphic operations being performed
@@ -1156,7 +1158,7 @@ void example_batching()
     encryptor.encrypt(plain_matrix, encrypted_matrix);
     cout << "Unrotated matrix: " << endl;
     print_matrix(pod_matrix);
-    cout << "Noise budget in unrotated matrix: "
+    cout << "Noise budget in fresh encryption: "
         << decryptor.invariant_noise_budget(encrypted_matrix) << " bits" << endl;
 
     /*

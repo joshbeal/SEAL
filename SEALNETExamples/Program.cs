@@ -1219,6 +1219,8 @@ namespace SEALNETExamples
             Console.Write("Encrypting: ");
             encryptor.Encrypt(plainMatrix, encryptedMatrix);
             Console.WriteLine("Done");
+            Console.WriteLine("Noise budget in fresh encryption: {0} bits",
+                decryptor.InvariantNoiseBudget(encryptedMatrix));
 
             /*
             Operating on the ciphertext results in homomorphic operations being performed
@@ -1286,7 +1288,7 @@ namespace SEALNETExamples
             encryptor.Encrypt(plainMatrix, encryptedMatrix);
             Console.WriteLine("Unrotated matrix: ");
             PrintMatrix(podMatrix);
-            Console.WriteLine("Noise budget in unrotated matrix: {0} bits",
+            Console.WriteLine("Noise budget in fresh encryption: {0} bits",
                 decryptor.InvariantNoiseBudget(encryptedMatrix));
 
             /*
