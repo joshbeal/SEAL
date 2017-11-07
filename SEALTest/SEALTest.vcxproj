@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -22,31 +22,45 @@
     <ClCompile Include="bigpoly.cpp" />
     <ClCompile Include="bigpolyarray.cpp" />
     <ClCompile Include="biguint.cpp" />
+    <ClCompile Include="ciphertext.cpp" />
+    <ClCompile Include="context.cpp" />
     <ClCompile Include="encoder.cpp" />
     <ClCompile Include="encryptionparams.cpp" />
     <ClCompile Include="encryptor.cpp" />
     <ClCompile Include="evaluationkeys.cpp" />
     <ClCompile Include="evaluator.cpp" />
+    <ClCompile Include="galoiskeys.cpp" />
+    <ClCompile Include="plaintext.cpp" />
+    <ClCompile Include="polycrt.cpp" />
+    <ClCompile Include="publickey.cpp" />
+    <ClCompile Include="secretkey.cpp" />
+    <ClCompile Include="smallmodulus.cpp" />
     <ClCompile Include="keygenerator.cpp" />
     <ClCompile Include="memorypoolhandle.cpp" />
     <ClCompile Include="randomgen.cpp" />
     <ClCompile Include="utilities.cpp" />
     <ClCompile Include="util\clipnormal.cpp" />
     <ClCompile Include="util\common.cpp" />
+    <ClCompile Include="util\hash.cpp" />
     <ClCompile Include="util\locks.cpp" />
     <ClCompile Include="util\mempool.cpp" />
     <ClCompile Include="util\modulus.cpp" />
     <ClCompile Include="util\ntt.cpp" />
+    <ClCompile Include="util\numth.cpp" />
     <ClCompile Include="util\polyarith.cpp" />
     <ClCompile Include="util\polyarithmod.cpp" />
+    <ClCompile Include="util\polyarithsmallmod.cpp" />
     <ClCompile Include="util\polycore.cpp" />
-    <ClCompile Include="util\polyfftmult.cpp" />
+    <ClCompile Include="util\nussbaumer.cpp" />
     <ClCompile Include="util\polyfftmultmod.cpp" />
+    <ClCompile Include="util\polyfftmultsmallmod.cpp" />
     <ClCompile Include="util\randomtostd.cpp" />
+    <ClCompile Include="util\smallntt.cpp" />
     <ClCompile Include="util\stringtouint64.cpp" />
     <ClCompile Include="util\uint64tostring.cpp" />
     <ClCompile Include="util\uintarith.cpp" />
     <ClCompile Include="util\uintarithmod.cpp" />
+    <ClCompile Include="util\uintarithsmallmod.cpp" />
     <ClCompile Include="util\uintcore.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -1,11 +1,11 @@
 # Makefile for SEAL examples
 BIN_DIR=../bin
 LIB_DIR=../bin
-INCLUDE_DIR=../SEAL
+INCLUDE_DIR=../SEAL/include
 SRCS=main.cpp
 SEALRUN=$(BIN_DIR)/sealexamples
 CXX=g++
-CXXFLAGS=-march=native -O3 -std=c++11
+CXXFLAGS=-march=native -O3 -std=c++11 -pthread
 LDFLAGS=
 
 .PHONY : all clean

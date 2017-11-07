@@ -2,7 +2,9 @@
 UTIL_DIR=util
 BIN_DIR=../bin
 OBJ_DIR=obj
-SRCS=$(wildcard *.cpp) $(wildcard $(UTIL_DIR)/*.cpp)
+INCLUDE_DIR=seal
+SRC_DIR=seal
+SRCS=$(wildcard $(SRC_DIR)/*.cpp) $(wildcard $(SRC_DIR)/$(UTIL_DIR)/*.cpp)
 OBJS=$(SRCS:%.cpp=$(OBJ_DIR)/%.o)
 DEPS=$(OBJS:.o=.d)
 INSTALL_DIR=SEAL
@@ -19,14 +21,14 @@ $(OBJ_DIR)/%.d : %.cpp
 	@-mkdir -p $(dir $@)
 	@set -e; \
 	rm -f $@; \
-	$(CXX) -MM $(CXXFLAGS) -I. -I$(UTIL_DIR) $< > $@.temp; \
+	$(CXX) -MM $(CXXFLAGS) -I. -I$(INCLUDE_DIR) -I$(INCLUDE_DIR)/$(UTIL_DIR) $< > $@.temp; \
 	SUBDIR_NAME=`echo $@|sed -e 's,\.,,' -e 's,$(UTIL_DIR),$(UTIL_DIR)/,'`; \
 	sed 's,\($(*F)\)\.o[ :]*,$(OBJ_DIR)/$(SUBDIR_NAME)\1.o $@ : ,g' < $@.temp > $@; \
 	rm -f $@.temp
 
 $(OBJ_DIR)/%.o : %.cpp
 	@-mkdir -p $(dir $@)
-	$(CXX) -c $(CXXFLAGS) -I. -I$(UTIL_DIR) -o $@ $<
+	$(CXX) -c $(CXXFLAGS) -I. -I$(INCLUDE_DIR) -I$(INCLUDE_DIR)/$(UTIL_DIR) -o $@ $<
 
 $(BIN_DIR)/$(SEALLIB) : $(OBJS)
 	@-mkdir -p $(dir $@)
@@ -37,11 +39,11 @@ clean :
 	@-rm -rf $(OBJ_DIR)
 
 install : $(BIN_DIR)/$(SEALLIB)
-	@-mkdir -p $(PREFIX)/lib/$(INSTALL_DIR)
-	@-mkdir -p $(PREFIX)/include/$(INSTALL_DIR)/util
+	@-mkdir -p $(PREFIX)/lib/$(INSTALL_DIR)/$(INCLUDE_DIR)
+	@-mkdir -p $(PREFIX)/include/$(INSTALL_DIR)/$(INCLUDE_DIR)/util
 	cp -f $(BIN_DIR)/$(SEALLIB) $(PREFIX)/lib/$(INSTALL_DIR)/$(SEALLIB)
-	cp -f *.h $(PREFIX)/include/$(INSTALL_DIR)
-	cp -f $(UTIL_DIR)/*.h $(PREFIX)/include/$(INSTALL_DIR)/$(UTIL_DIR)
+	cp -f $(INCLUDE_DIR)/*.h $(PREFIX)/include/$(INSTALL_DIR)/$(INCLUDE_DIR)
+	cp -f $(INCLUDE_DIR)/$(UTIL_DIR)/*.h $(PREFIX)/include/$(INSTALL_DIR)/$(INCLUDE_DIR)/$(UTIL_DIR)
 
 uninstall :
 	rm -rf $(PREFIX)/lib/$(INSTALL_DIR)

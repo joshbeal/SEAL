@@ -1,0 +1,16 @@
+*/obj/*
+obj/*
+*/bin/*
+bin/*
+*.o
+*/~*
+*~
+*.out
+*.psess
+*.vsp
+*.vspx
+*/x64/*
+x64/*
+*.user
+*/.vs
+.vs
