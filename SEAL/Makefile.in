@@ -21,14 +21,14 @@ $(OBJ_DIR)/%.d : %.cpp
 	@-mkdir -p $(dir $@)
 	@set -e; \
 	rm -f $@; \
-	$(CXX) -MM $(CXXFLAGS) -I. -I$(INCLUDE_DIR) -I$(INCLUDE_DIR)/$(UTIL_DIR) $< > $@.temp; \
+	$(CXX) -MM $(CXXFLAGS) -I. $< > $@.temp; \
 	SUBDIR_NAME=`echo $@|sed -e 's,\.,,' -e 's,$(UTIL_DIR),$(UTIL_DIR)/,'`; \
 	sed 's,\($(*F)\)\.o[ :]*,$(OBJ_DIR)/$(SUBDIR_NAME)\1.o $@ : ,g' < $@.temp > $@; \
 	rm -f $@.temp
 
 $(OBJ_DIR)/%.o : %.cpp
 	@-mkdir -p $(dir $@)
-	$(CXX) -c $(CXXFLAGS) -I. -I$(INCLUDE_DIR) -I$(INCLUDE_DIR)/$(UTIL_DIR) -o $@ $<
+	$(CXX) -c $(CXXFLAGS) -I. -o $@ $<
 
 $(BIN_DIR)/$(SEALLIB) : $(OBJS)
 	@-mkdir -p $(dir $@)
