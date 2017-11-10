@@ -49,6 +49,7 @@
 // Use compiler intrinsics for better performance
 #define SEAL_ENABLE_INTRIN
 
+#ifdef SEAL_ENABLE_INTRIN
 #include <intrin.h>
 
 #pragma intrinsic(_addcarry_u64)
@@ -81,6 +82,7 @@
         static_cast<unsigned long long>(operand2),                                  \
         reinterpret_cast<unsigned long long*>(hw64));                               \
 }
+#endif
 
 #else //_M_X64
 
@@ -150,19 +152,16 @@
 
 // Use generic functions as (slower) fallback
 #ifndef SEAL_ADD_CARRY_UINT64
-extern unsigned char add_uint64_generic(std::uint64_t, std::uint64_t, unsigned char, std::uint64_t *);
 #define SEAL_ADD_CARRY_UINT64(operand1, operand2, carry, result) add_uint64_generic(operand1, operand2, carry, result)
 //#pragma message("SEAL_ADD_CARRY_UINT64 not defined. Using add_uint64_generic (see util/defines.h)")
 #endif
 
 #ifndef SEAL_SUB_BORROW_UINT64
-extern unsigned char sub_uint64_generic(std::uint64_t, std::uint64_t, unsigned char, std::uint64_t *);
 #define SEAL_SUB_BORROW_UINT64(operand1, operand2, borrow, result) sub_uint64_generic(operand1, operand2, borrow, result)
 //#pragma message("SEAL_SUB_BORROW_UINT64 not defined. Using sub_uint64_generic (see util/defines.h).")
 #endif
 
 #ifndef SEAL_MULTIPLY_UINT64
-extern void multiply_uint64_generic(std::uint64_t, std::uint64_t, std::uint64_t *);
 #define SEAL_MULTIPLY_UINT64(operand1, operand2, result128) {                      \
     multiply_uint64_generic(operand1, operand2, result128);                        \
 }
@@ -170,7 +169,6 @@ extern void multiply_uint64_generic(std::uint64_t, std::uint64_t, std::uint64_t 
 #endif
 
 #ifndef SEAL_MULTIPLY_UINT64_HW64
-extern void multiply_uint64_hw64_generic(std::uint64_t, std::uint64_t, std::uint64_t *);
 #define SEAL_MULTIPLY_UINT64_HW64(operand1, operand2, hw64) {                      \
     multiply_uint64_hw64_generic(operand1, operand2, hw64);                        \
 }
@@ -178,7 +176,6 @@ extern void multiply_uint64_hw64_generic(std::uint64_t, std::uint64_t, std::uint
 #endif
 
 #ifndef SEAL_MSB_INDEX_UINT64
-extern void get_msb_index_generic(unsigned long *, std::uint64_t);
 #define SEAL_MSB_INDEX_UINT64(result, value) get_msb_index_generic(result, value)
 //#pragma message("SEAL_MSB_INDEX_UINT64 not defined. Using get_msb_index_generic (see util/defines.h).")
 #endif
