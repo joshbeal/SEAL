@@ -10,7 +10,7 @@ namespace SEALNETTest
     public class PolyCRTBuilderWrapper
     {
         [TestMethod]
-        public void BatchUnbatchMatrixNET()
+        public void BatchUnbatchVectorNET()
         {
             var parms = new EncryptionParameters();
             parms.SetPolyModulus("1x^64 + 1");
@@ -42,6 +42,45 @@ namespace SEALNETTest
             Assert.IsTrue(plain.ToString().Equals("5"));
             crtbuilder.Decompose(plain, plain_vec2);
             Assert.IsTrue(plain_vec.SequenceEqual(plain_vec2));
+        }
+
+        [TestMethod]
+        public void BatchUnbatchPlaintextNET()
+        {
+            var parms = new EncryptionParameters();
+            parms.SetPolyModulus("1x^64 + 1");
+            parms.SetCoeffModulus(new List<SmallModulus> { DefaultParams.SmallMods60Bit(0) });
+            parms.SetPlainModulus(257);
+
+            var context = new SEALContext(parms);
+            Assert.IsTrue(context.Qualifiers.EnableBatching);
+
+            var crtbuilder = new PolyCRTBuilder(context);
+            Assert.AreEqual(64, crtbuilder.SlotCount);
+            var plain = new Plaintext(crtbuilder.SlotCount);
+            for (int i = 0; i < crtbuilder.SlotCount; i++)
+            {
+                plain[i] = (UInt64)i;
+            }
+
+            crtbuilder.Compose(plain);
+            crtbuilder.Decompose(plain);
+            for (int i = 0; i < crtbuilder.SlotCount; i++)
+            {
+                Assert.IsTrue(plain[i] == (UInt64)i);
+            }
+
+            for (int i = 0; i < crtbuilder.SlotCount; i++)
+            {
+                plain[i] = (UInt64)5;
+            }
+            crtbuilder.Compose(plain);
+            Assert.IsTrue(plain.ToString().Equals("5"));
+            crtbuilder.Decompose(plain);
+            for (int i = 0; i < crtbuilder.SlotCount; i++)
+            {
+                Assert.IsTrue(plain[i] == (UInt64)5);
+            }
         }
     }
 }

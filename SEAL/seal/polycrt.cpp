@@ -123,8 +123,6 @@ namespace seal
 
         // Set leading coefficient to zero
         destination[slots_] = 0;
-
-        // First write the values to destination coefficients
 #ifdef SEAL_DEBUG
         for (int i = 0; i < slots_; i++)
         {
@@ -135,7 +133,8 @@ namespace seal
             }
         }
 #endif
-        // Read in top row, then bottom row
+        // First write the values to destination coefficients. Read 
+        // in top row, then bottom row.
         for (int i = 0; i < slots_; i++)
         {
             destination[matrix_reps_index_map_[i]] = values_matrix[i];
@@ -146,7 +145,52 @@ namespace seal
         inverse_ntt_negacyclic_harvey(destination.pointer(), ntt_tables_);
     }
 
-    void PolyCRTBuilder::decompose(const Plaintext &plain, vector<uint64_t> &destination, const MemoryPoolHandle &pool) 
+    void PolyCRTBuilder::compose(Plaintext &plain, const MemoryPoolHandle &pool)
+    {
+        int coeff_count = parms_.poly_modulus().coeff_count();
+        uint64_t row_size = slots_ >> 1;
+
+        // Validate input parameters
+        if (plain.coeff_count() > coeff_count || (plain.coeff_count() == coeff_count && plain[coeff_count - 1] != 0))
+        {
+            throw invalid_argument("plain is not valid for encryption parameters");
+        }
+#ifdef SEAL_DEBUG
+        if (plain.significant_coeff_count() >= coeff_count || !are_poly_coefficients_less_than(plain.pointer(),
+            plain.coeff_count(), 1, parms_.plain_modulus().pointer(), parms_.plain_modulus().uint64_count()))
+        {
+            throw invalid_argument("plain is not valid for encryption parameters");
+        }
+#endif
+        if (!pool)
+        {
+            throw invalid_argument("pool is uninitialized");
+        }
+
+        // We need to permute the coefficients of plain. To do this, we allocate 
+        // temporary space.
+        int input_plain_coeff_count = plain.coeff_count();
+        Pointer temp(allocate_uint(input_plain_coeff_count, pool));
+        set_uint_uint(plain.pointer(), input_plain_coeff_count, temp.get());
+
+        // Set plain to full slot count size (note that all new coefficients are 
+        // set to zero).
+        plain.resize(slots_);
+
+        // First write the values to destination coefficients. Read 
+        // in top row, then bottom row.
+        for (int i = 0; i < input_plain_coeff_count; i++)
+        {
+            *(plain.pointer() + matrix_reps_index_map_[i]) = temp[i];
+        }
+
+        // Transform destination using inverse of negacyclic NTT
+        // Note: We already performed bit-reversal when reading in the matrix
+        inverse_ntt_negacyclic_harvey(plain.pointer(), ntt_tables_);
+    }
+
+    void PolyCRTBuilder::decompose(const Plaintext &plain, vector<uint64_t> &destination,
+        const MemoryPoolHandle &pool) 
     {
         int coeff_count = parms_.poly_modulus().coeff_count();
         uint64_t row_size = slots_ >> 1;
@@ -187,6 +231,52 @@ namespace seal
         for (int i = 0; i < slots_; i++)
         {
             destination[i] = temp_dest[matrix_reps_index_map_[i]];
+        }
+    }
+
+    void PolyCRTBuilder::decompose(Plaintext &plain, const MemoryPoolHandle &pool)
+    {
+        int coeff_count = parms_.poly_modulus().coeff_count();
+        uint64_t row_size = slots_ >> 1;
+
+        // Validate input parameters
+        if (plain.coeff_count() > coeff_count || (plain.coeff_count() == coeff_count && plain[coeff_count - 1] != 0))
+        {
+            throw invalid_argument("plain is not valid for encryption parameters");
+        }
+#ifdef SEAL_DEBUG
+        if (plain.significant_coeff_count() >= coeff_count || !are_poly_coefficients_less_than(plain.pointer(),
+            plain.coeff_count(), 1, parms_.plain_modulus().pointer(), parms_.plain_modulus().uint64_count()))
+        {
+            throw invalid_argument("plain is not valid for encryption parameters");
+        }
+#endif
+        if (!pool)
+        {
+            throw invalid_argument("pool is uninitialized");
+        }
+
+        // Never include the leading zero coefficient (if present)
+        int plain_coeff_count = min(plain.coeff_count(), slots_);
+
+        // Allocate temporary space to store a wide copy of plain
+        Pointer temp(allocate_uint(slots_, pool));
+
+        // Make a copy of poly
+        set_uint_uint(plain.pointer(), plain_coeff_count, temp.get());
+        set_zero_uint(slots_ - plain_coeff_count, temp.get() + plain_coeff_count);
+
+        // Transform destination using negacyclic NTT.
+        ntt_negacyclic_harvey(temp.get(), ntt_tables_);
+
+        // Set plain to full slot count size (note that all new coefficients are 
+        // set to zero).
+        plain.resize(slots_);
+
+        // Read top row
+        for (int i = 0; i < slots_; i++)
+        {
+            *(plain.pointer() + i) = temp[matrix_reps_index_map_[i]];
         }
     }
 }

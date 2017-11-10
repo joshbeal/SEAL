@@ -130,6 +130,50 @@ namespace Microsoft
                     Plaintext ^destination);
 
                 /**
+                <summary>Creates a SEAL plaintext from a given matrix.</summary>
+
+                <remarks>
+                Creates a SEAL plaintext from a given matrix. This function "batches" a given matrix
+                of integers modulo the plaintext modulus in-place into a SEAL plaintext ready to be
+                encrypted. The matrix is given as a plaintext element whose first N/2 coefficients
+                represent the first row of the matrix, and the second N/2 coefficients represent the
+                second row, where N denotes the degree of the polynomial modulus. The input plaintext
+                must have degress less than the polynomial modulus, and coefficients less than the
+                plaintext modulus, i.e. it must be a valid plaintext for the encryption parameters.
+                Dynamic memory allocations in the process are allocated from the memory pool pointed
+                to by the given <see cref="MemoryPoolHandle" />.
+                </remarks>
+                <param name="plain">The matrix of integers modulo plaintext modulus to batch</param>
+                <param name="pool">The MemoryPoolHandle pointing to a valid memory pool</param>
+                <exception cref="System::ArgumentException">if plain is not valid for the encryption
+                parameters</exception>
+                <exception cref="System::ArgumentException">if pool is uninitialized</exception>
+                <exception cref="System::ArgumentNullException">if plain or pool is null</exception>
+                */
+                void Compose(Plaintext ^plain, MemoryPoolHandle ^pool);
+
+                /**
+                <summary>Creates a SEAL plaintext from a given matrix.</summary>
+
+                <remarks>
+                Creates a SEAL plaintext from a given matrix. This function "batches" a given matrix
+                of integers modulo the plaintext modulus in-place into a SEAL plaintext ready to be
+                encrypted. The matrix is given as a plaintext element whose first N/2 coefficients
+                represent the first row of the matrix, and the second N/2 coefficients represent the
+                second row, where N denotes the degree of the polynomial modulus. The input plaintext
+                must have degress less than the polynomial modulus, and coefficients less than the
+                plaintext modulus, i.e. it must be a valid plaintext for the encryption parameters.
+                Dynamic memory allocations in the process are allocated from the memory pool pointed
+                to by the local <see cref="MemoryPoolHandle" />.
+                </remarks>
+                <param name="plain">The matrix of integers modulo plaintext modulus to batch</param>
+                <exception cref="System::ArgumentException">if plain is not valid for the encryption
+                parameters</exception>
+                <exception cref="System::ArgumentNullException">if plain is null</exception>
+                */
+                void Compose(Plaintext ^plain);
+
+                /**
                 <summary>Inverse of compose.</summary>
 
                 <remarks>
@@ -175,6 +219,46 @@ namespace Microsoft
                 void Decompose(Plaintext ^plain, 
                     System::Collections::Generic::List<System::UInt64> ^destination,
                     MemoryPoolHandle ^pool);
+
+                /**
+                <summary>Inverse of compose.</summary>
+
+                <remarks>
+                Inverse of compose. This function "unbatches" a given SEAL plaintext in-place into
+                a matrix of integers modulo the plaintext modulus. The input plaintext must have
+                degress less than the polynomial modulus, and coefficients less than the plaintext
+                modulus, i.e. it must be a valid plaintext for the encryption parameters. Dynamic
+                memory allocations in the process are allocated from the memory pool pointed to by
+                the given <see cref="MemoryPoolHandle" />.
+                </remarks>
+                <param name="plain">The matrix of integers modulo plaintext modulus to batch</param>
+                <param name="pool">The MemoryPoolHandle pointing to a valid memory pool</param>
+                <exception cref="System::ArgumentException">if plain is not valid for the encryption
+                parameters</exception>
+                <exception cref="System::ArgumentException">if pool is uninitialized</exception>
+                <exception cref="System::ArgumentNullException">if plain or pool is null</exception>
+                */
+                void Decompose(Plaintext ^plain, MemoryPoolHandle ^pool);
+
+                /**
+                <summary>Inverse of compose.</summary>
+
+                <remarks>
+                Inverse of compose. This function "unbatches" a given SEAL plaintext in-place into
+                a matrix of integers modulo the plaintext modulus. The input plaintext must have
+                degress less than the polynomial modulus, and coefficients less than the plaintext
+                modulus, i.e. it must be a valid plaintext for the encryption parameters. Dynamic
+                memory allocations in the process are allocated from the memory pool pointed to by
+                the local <see cref="MemoryPoolHandle" />.
+                </remarks>
+                <param name="plain">The matrix of integers modulo plaintext modulus to batch</param>
+                <param name="pool">The MemoryPoolHandle pointing to a valid memory pool</param>
+                <exception cref="System::ArgumentException">if plain is not valid for the encryption
+                parameters</exception>
+                <exception cref="System::ArgumentException">if pool is uninitialized</exception>
+                <exception cref="System::ArgumentNullException">if plain or pool is null</exception>
+                */
+                void Decompose(Plaintext ^plain);
 
                 /**
                 <summary>Returns the number of slots.</summary>

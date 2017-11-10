@@ -105,6 +105,43 @@ namespace seal
         @throws std::invalid_argument if values has incorrect size
         */
         void compose(const std::vector<std::uint64_t> &values, Plaintext &destination);
+        
+        /**
+        Creates a SEAL plaintext from a given matrix. This function "batches" a given matrix
+        of integers modulo the plaintext modulus in-place into a SEAL plaintext ready to be
+        encrypted. The matrix is given as a plaintext element whose first N/2 coefficients
+        represent the first row of the matrix, and the second N/2 coefficients represent the
+        second row, where N denotes the degree of the polynomial modulus. The input plaintext
+        must have degress less than the polynomial modulus, and coefficients less than the 
+        plaintext modulus, i.e. it must be a valid plaintext for the encryption parameters. 
+        Dynamic memory allocations in the process are allocated from the memory pool pointed 
+        to by the given MemoryPoolHandle.
+
+        @param[in] plain The matrix of integers modulo plaintext modulus to batch
+        @param[in] pool The MemoryPoolHandle pointing to a valid memory pool
+        @throws std::invalid_argument if plain is not valid for the encryption parameters
+        @throws std::invalid_argument if pool is uninitialized
+        */
+        void compose(Plaintext &plain, const MemoryPoolHandle &pool);
+
+        /**
+        Creates a SEAL plaintext from a given matrix. This function "batches" a given matrix
+        of integers modulo the plaintext modulus in-place into a SEAL plaintext ready to be
+        encrypted. The matrix is given as a plaintext element whose first N/2 coefficients
+        represent the first row of the matrix, and the second N/2 coefficients represent the
+        second row, where N denotes the degree of the polynomial modulus. The input plaintext
+        must have degress less than the polynomial modulus, and coefficients less than the
+        plaintext modulus, i.e. it must be a valid plaintext for the encryption parameters.
+        Dynamic memory allocations in the process are allocated from the memory pool pointed
+        to by the local MemoryPoolHandle.
+
+        @param[in] plain The matrix of integers modulo plaintext modulus to batch
+        @throws std::invalid_argument if plain is not valid for the encryption parameters
+        */
+        void compose(Plaintext &plain)
+        {
+            compose(plain, pool_);
+        }
 
         /**
         Inverse of compose. This function "unbatches" a given SEAL plaintext into a matrix
@@ -138,6 +175,37 @@ namespace seal
         inline void decompose(const Plaintext &plain, std::vector<std::uint64_t> &destination)
         {
             decompose(plain, destination, pool_);
+        }
+
+        /**
+        Inverse of compose. This function "unbatches" a given SEAL plaintext in-place into 
+        a matrix of integers modulo the plaintext modulus. The input plaintext must have 
+        degress less than the polynomial modulus, and coefficients less than the plaintext 
+        modulus, i.e. it must be a valid plaintext for the encryption parameters. Dynamic 
+        memory allocations in the process are allocated from the memory pool pointed to by 
+        the given MemoryPoolHandle.
+
+        @param[in] plain The plaintext polynomial to unbatch
+        @param[in] pool The MemoryPoolHandle pointing to a valid memory pool
+        @throws std::invalid_argument if plain is not valid for the encryption parameters
+        @throws std::invalid_argument if pool is uninitialized
+        */
+        void decompose(Plaintext &plain, const MemoryPoolHandle &pool);
+
+        /**
+        Inverse of compose. This function "unbatches" a given SEAL plaintext in-place into
+        a matrix of integers modulo the plaintext modulus. The input plaintext must have
+        degress less than the polynomial modulus, and coefficients less than the plaintext
+        modulus, i.e. it must be a valid plaintext for the encryption parameters. Dynamic
+        memory allocations in the process are allocated from the memory pool pointed to by
+        the local MemoryPoolHandle.
+
+        @param[in] plain The plaintext polynomial to unbatch
+        @throws std::invalid_argument if plain is not valid for the encryption parameters
+        */
+        void decompose(Plaintext &plain)
+        {
+            decompose(plain, pool_);
         }
 
         /**

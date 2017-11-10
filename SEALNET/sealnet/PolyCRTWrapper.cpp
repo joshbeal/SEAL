@@ -141,6 +141,61 @@ namespace Microsoft
                 }
             }
 
+            void PolyCRTBuilder::Compose(Plaintext ^plain, MemoryPoolHandle ^pool)
+            {
+                if (polyCRTBuilder_ == nullptr)
+                {
+                    throw gcnew ObjectDisposedException("PolyCRTBuilder is disposed");
+                }
+                if (plain == nullptr)
+                {
+                    throw gcnew ArgumentNullException("plain cannot be null");
+                }
+                if (pool == nullptr)
+                {
+                    throw gcnew ArgumentNullException("pool cannot be null");
+                }
+                try
+                {
+                    polyCRTBuilder_->compose(plain->GetPlaintext(), pool->GetHandle());
+                    GC::KeepAlive(plain);
+                    GC::KeepAlive(pool);
+                }
+                catch (const exception &e)
+                {
+                    HandleException(&e);
+                }
+                catch (...)
+                {
+                    HandleException(nullptr);
+                }
+            }
+
+            void PolyCRTBuilder::Compose(Plaintext ^plain)
+            {
+                if (polyCRTBuilder_ == nullptr)
+                {
+                    throw gcnew ObjectDisposedException("PolyCRTBuilder is disposed");
+                }
+                if (plain == nullptr)
+                {
+                    throw gcnew ArgumentNullException("plain cannot be null");
+                }
+                try
+                {
+                    polyCRTBuilder_->compose(plain->GetPlaintext());
+                    GC::KeepAlive(plain);
+                }
+                catch (const exception &e)
+                {
+                    HandleException(&e);
+                }
+                catch (...)
+                {
+                    HandleException(nullptr);
+                }
+            }
+
             void PolyCRTBuilder::Decompose(Plaintext ^plain, List<UInt64> ^destination)
             {
                 if (polyCRTBuilder_ == nullptr)
@@ -206,6 +261,61 @@ namespace Microsoft
                     {
                         destination->Add(v_destination[i]);
                     }
+                }
+                catch (const exception &e)
+                {
+                    HandleException(&e);
+                }
+                catch (...)
+                {
+                    HandleException(nullptr);
+                }
+            }
+
+            void PolyCRTBuilder::Decompose(Plaintext ^plain, MemoryPoolHandle ^pool)
+            {
+                if (polyCRTBuilder_ == nullptr)
+                {
+                    throw gcnew ObjectDisposedException("PolyCRTBuilder is disposed");
+                }
+                if (plain == nullptr)
+                {
+                    throw gcnew ArgumentNullException("plain cannot be null");
+                }
+                if (pool == nullptr)
+                {
+                    throw gcnew ArgumentNullException("pool cannot be null");
+                }
+                try
+                {
+                    polyCRTBuilder_->decompose(plain->GetPlaintext(), pool->GetHandle());
+                    GC::KeepAlive(plain);
+                    GC::KeepAlive(pool);
+                }
+                catch (const exception &e)
+                {
+                    HandleException(&e);
+                }
+                catch (...)
+                {
+                    HandleException(nullptr);
+                }
+            }
+
+            void PolyCRTBuilder::Decompose(Plaintext ^plain)
+            {
+                if (polyCRTBuilder_ == nullptr)
+                {
+                    throw gcnew ObjectDisposedException("PolyCRTBuilder is disposed");
+                }
+                if (plain == nullptr)
+                {
+                    throw gcnew ArgumentNullException("plain cannot be null");
+                }
+                try
+                {
+                    polyCRTBuilder_->decompose(plain->GetPlaintext());
+                    GC::KeepAlive(plain);
                 }
                 catch (const exception &e)
                 {

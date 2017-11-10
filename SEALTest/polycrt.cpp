@@ -14,7 +14,7 @@ namespace SEALTest
     TEST_CLASS(PolyCRTBuilderTest)
     {
     public:
-        TEST_METHOD(BatchUnbatchMatrix)
+        TEST_METHOD(BatchUnbatchVector)
         {
             EncryptionParameters parms;
             parms.set_poly_modulus("1x^64 + 1");
@@ -46,6 +46,44 @@ namespace SEALTest
             Assert::IsTrue(plain.to_string() == "5");
             crtbuilder.decompose(plain, plain_vec2);
             Assert::IsTrue(plain_vec == plain_vec2);
+        }
+
+        TEST_METHOD(BatchUnbatchPlaintext)
+        {
+            EncryptionParameters parms;
+            parms.set_poly_modulus("1x^64 + 1");
+            parms.set_coeff_modulus({ small_mods_60bit(0) });
+            parms.set_plain_modulus(257);
+
+            SEALContext context(parms);
+            Assert::IsTrue(context.qualifiers().enable_batching);
+
+            PolyCRTBuilder crtbuilder(context);
+            Assert::AreEqual(64, crtbuilder.slot_count());
+            Plaintext plain(crtbuilder.slot_count());
+            for (int i = 0; i < crtbuilder.slot_count(); i++)
+            {
+                plain[i] = i;
+            }
+
+            crtbuilder.compose(plain);
+            crtbuilder.decompose(plain);
+            for (int i = 0; i < crtbuilder.slot_count(); i++)
+            {
+                Assert::IsTrue(plain[i] == i);
+            }
+
+            for (int i = 0; i < crtbuilder.slot_count(); i++)
+            {
+                plain[i] = 5;
+            }
+            crtbuilder.compose(plain);
+            Assert::IsTrue(plain.to_string() == "5");
+            crtbuilder.decompose(plain);
+            for (int i = 0; i < crtbuilder.slot_count(); i++)
+            {
+                plain[i] == 5;
+            }
         }
     };
 }
