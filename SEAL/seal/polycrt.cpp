@@ -169,7 +169,7 @@ namespace seal
 
         // We need to permute the coefficients of plain. To do this, we allocate 
         // temporary space.
-        int input_plain_coeff_count = plain.coeff_count();
+        int input_plain_coeff_count = min(plain.coeff_count(), slots_);
         Pointer temp(allocate_uint(input_plain_coeff_count, pool));
         set_uint_uint(plain.pointer(), input_plain_coeff_count, temp.get());
 
