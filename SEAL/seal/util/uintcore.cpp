@@ -2,6 +2,7 @@
 #include "seal/util/uintcore.h"
 #include "seal/util/uintarith.h"
 #include <algorithm>
+#include <string>
 
 using namespace std;
 
@@ -54,7 +55,7 @@ namespace seal
             // Return 0 if nothing remains.
             if (output.empty())
             {
-                return "0";
+                return string("0");
             }
 
             return output;
@@ -74,7 +75,7 @@ namespace seal
 #endif
             if (uint64_count == 0)
             {
-                return "0";
+                return string("0");
             }
             Pointer remainder(allocate_uint(uint64_count, pool));
             Pointer quotient(allocate_uint(uint64_count, pool));
@@ -97,7 +98,7 @@ namespace seal
             // Return 0 if nothing remains.
             if (output.empty())
             {
-                return "0";
+                return string("0");
             }
 
             return output;
