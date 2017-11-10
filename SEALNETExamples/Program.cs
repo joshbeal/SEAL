@@ -643,14 +643,26 @@ namespace SEALNETExamples
             more noise budget. A small decomposition bit count can make relinearization 
             slower, but might not change the noise budget by any observable amount.
 
-            Relinearization requires a special type of keys called `evaluation keys'.
+            Relinearization requires a special type of key called `evaluation keys'.
             These can be created by the KeyGenerator for any decomposition bit count.
+            To relinearize a ciphertext of size M >= 2 back to size 2, we actually need 
+            M-2 evaluation keys. Attempting to relinearize a too large ciphertext with
+            too few evaluation keys will result in an exception being thrown.
+
             We repeat our computation, but this time relinearize after both squarings.
+            Since our ciphertext never grows past size 3 (we relinearize after every
+            multiplication), it suffices to generate only one evaluation key.
 
             First, we need to create evaluation keys. We use a decomposition bit count 
             of 16 here, which can be thought of as quite small.
             */
             var evKeys16 = new EvaluationKeys();
+
+            /*
+            This function generates one single evaluation key. Another overload takes 
+            the number of keys to be generated as an argument, but one is all we need
+            in this example (see above).
+            */
             keygen.GenerateEvaluationKeys(16, evKeys16);
 
             Console.Write($"Encrypting {plain1}: ");
