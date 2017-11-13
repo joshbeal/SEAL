@@ -9,7 +9,7 @@ OBJS=$(SRCS:%.cpp=$(OBJ_DIR)/%.o)
 DEPS=$(OBJS:.o=.d)
 INSTALL_DIR=SEAL
 SEALLIB=libseal.a
-CXX=@CXX@
+CXX=@CXX@-6
 CXXFLAGS=@CXXFLAGS@ @DEFS@ -march=native -std=c++11
 PREFIX=@prefix@
 
