@@ -52,7 +52,7 @@ namespace seal
             uint64_t size_entire_group = modulus.value() - 1;
 
             // Compute size of quotient group
-            uint64_t size_quotient_group = (modulus.value() - 1) / degree;
+            uint64_t size_quotient_group = size_entire_group / degree;
 
             // size_entire_group must be divisible by degree, or otherwise the primitive root does not exist in integers modulo modulus
             if (size_entire_group - size_quotient_group * degree != 0)
