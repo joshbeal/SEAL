@@ -141,6 +141,41 @@ namespace Microsoft
                 }
             }
 
+            void PolyCRTBuilder::Compose(List<Int64> ^values, Plaintext ^destination)
+            {
+                if (polyCRTBuilder_ == nullptr)
+                {
+                    throw gcnew ObjectDisposedException("PolyCRTBuilder is disposed");
+                }
+                if (values == nullptr)
+                {
+                    throw gcnew ArgumentNullException("values cannot be null");
+                }
+                if (destination == nullptr)
+                {
+                    throw gcnew ArgumentNullException("destination cannot be null");
+                }
+                try
+                {
+                    vector<int64_t> v_values;
+                    for each (Int64 val in values)
+                    {
+                        v_values.emplace_back(val);
+                    }
+
+                    polyCRTBuilder_->compose(v_values, destination->GetPlaintext());
+                    GC::KeepAlive(destination);
+                }
+                catch (const exception &e)
+                {
+                    HandleException(&e);
+                }
+                catch (...)
+                {
+                    HandleException(nullptr);
+                }
+            }
+
             void PolyCRTBuilder::Compose(Plaintext ^plain, MemoryPoolHandle ^pool)
             {
                 if (polyCRTBuilder_ == nullptr)
@@ -232,6 +267,42 @@ namespace Microsoft
                 }
             }
 
+            void PolyCRTBuilder::Decompose(Plaintext ^plain, List<Int64> ^destination)
+            {
+                if (polyCRTBuilder_ == nullptr)
+                {
+                    throw gcnew ObjectDisposedException("PolyCRTBuilder is disposed");
+                }
+                if (plain == nullptr)
+                {
+                    throw gcnew ArgumentNullException("plain cannot be null");
+                }
+                if (destination == nullptr)
+                {
+                    throw gcnew ArgumentNullException("destination cannot be null");
+                }
+                try
+                {
+                    destination->Clear();
+                    vector<int64_t> v_destination;
+                    polyCRTBuilder_->decompose(plain->GetPlaintext(), v_destination);
+                    GC::KeepAlive(plain);
+
+                    for (size_t i = 0; i < v_destination.size(); i++)
+                    {
+                        destination->Add(v_destination[i]);
+                    }
+                }
+                catch (const exception &e)
+                {
+                    HandleException(&e);
+                }
+                catch (...)
+                {
+                    HandleException(nullptr);
+                }
+            }
+
             void PolyCRTBuilder::Decompose(Plaintext ^plain, List<UInt64> ^destination, MemoryPoolHandle ^pool)
             {
                 if (polyCRTBuilder_ == nullptr)
@@ -256,6 +327,48 @@ namespace Microsoft
                     vector<uint64_t> v_destination;
                     polyCRTBuilder_->decompose(plain->GetPlaintext(), v_destination, pool->GetHandle());
                     GC::KeepAlive(plain);
+                    GC::KeepAlive(pool);
+
+                    for (size_t i = 0; i < v_destination.size(); i++)
+                    {
+                        destination->Add(v_destination[i]);
+                    }
+                }
+                catch (const exception &e)
+                {
+                    HandleException(&e);
+                }
+                catch (...)
+                {
+                    HandleException(nullptr);
+                }
+            }
+
+            void PolyCRTBuilder::Decompose(Plaintext ^plain, List<Int64> ^destination, MemoryPoolHandle ^pool)
+            {
+                if (polyCRTBuilder_ == nullptr)
+                {
+                    throw gcnew ObjectDisposedException("PolyCRTBuilder is disposed");
+                }
+                if (plain == nullptr)
+                {
+                    throw gcnew ArgumentNullException("plain cannot be null");
+                }
+                if (destination == nullptr)
+                {
+                    throw gcnew ArgumentNullException("destination cannot be null");
+                }
+                if (pool == nullptr)
+                {
+                    throw gcnew ArgumentNullException("pool cannot be null");
+                }
+                try
+                {
+                    destination->Clear();
+                    vector<int64_t> v_destination;
+                    polyCRTBuilder_->decompose(plain->GetPlaintext(), v_destination, pool->GetHandle());
+                    GC::KeepAlive(plain);
+                    GC::KeepAlive(pool);
 
                     for (size_t i = 0; i < v_destination.size(); i++)
                     {

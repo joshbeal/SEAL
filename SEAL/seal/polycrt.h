@@ -105,6 +105,21 @@ namespace seal
         @throws std::invalid_argument if values is too large
         */
         void compose(const std::vector<std::uint64_t> &values, Plaintext &destination);
+
+        /**
+        Creates a SEAL plaintext from a given matrix. This function "batches" a given matrix
+        of integers modulo the plaintext modulus into a SEAL plaintext element, and stores
+        the result in the destination parameter. The input vector must have size at most equal
+        to the degree of the polynomial modulus. The first half of the elements represent the
+        first row of the matrix, and the second half represent the second row. The numbers
+        in the matrix can be at most equal to the plaintext modulus for it to represent
+        a valid SEAL plaintext.
+
+        @param[in] values The matrix of integers modulo plaintext modulus to batch
+        @param[out] destination The plaintext polynomial to overwrite with the result
+        @throws std::invalid_argument if values is too large
+        */
+        void compose(const std::vector<std::int64_t> &values, Plaintext &destination);
         
         /**
         Creates a SEAL plaintext from a given matrix. This function "batches" a given matrix
@@ -173,6 +188,40 @@ namespace seal
         @throws std::invalid_argument if plain is not valid for the encryption parameters
         */
         inline void decompose(const Plaintext &plain, std::vector<std::uint64_t> &destination)
+        {
+            decompose(plain, destination, pool_);
+        }
+
+        /**
+        Inverse of compose. This function "unbatches" a given SEAL plaintext into a matrix
+        of integers modulo the plaintext modulus, and stores the result in the destination
+        parameter. The input plaintext must have degress less than the polynomial modulus,
+        and coefficients less than the plaintext modulus, i.e. it must be a valid plaintext
+        for the encryption parameters. Dynamic memory allocations in the process are
+        allocated from the memory pool pointed to by the given MemoryPoolHandle.
+
+        @param[in] plain The plaintext polynomial to unbatch
+        @param[out] destination The vector to be overwritten with the values of the slots
+        @param[in] pool The MemoryPoolHandle pointing to a valid memory pool
+        @throws std::invalid_argument if plain is not valid for the encryption parameters
+        @throws std::invalid_argument if pool is uninitialized
+        */
+        void decompose(const Plaintext &plain, std::vector<std::int64_t> &destination,
+            const MemoryPoolHandle &pool);
+
+        /**
+        Inverse of compose. This function "unbatches" a given SEAL plaintext into a matrix
+        of integers modulo the plaintext modulus, and stores the result in the destination
+        parameter. The input plaintext must have degress less than the polynomial modulus,
+        and coefficients less than the plaintext modulus, i.e. it must be a valid plaintext
+        for the encryption parameters. Dynamic memory allocations in the process are
+        allocated from the memory pool pointed to by the local MemoryPoolHandle.
+
+        @param[in] plain The plaintext polynomial to unbatch
+        @param[out] destination The vector to be overwritten with the values of the slots
+        @throws std::invalid_argument if plain is not valid for the encryption parameters
+        */
+        inline void decompose(const Plaintext &plain, std::vector<std::int64_t> &destination)
         {
             decompose(plain, destination, pool_);
         }

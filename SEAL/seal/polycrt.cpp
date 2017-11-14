@@ -37,7 +37,8 @@ namespace seal
 
         // Set mod_ and polymod_
         mod_ = parms_.plain_modulus();
-        polymod_ = PolyModulus(parms_.poly_modulus().pointer(), coeff_count, parms_.poly_modulus().coeff_uint64_count());
+        polymod_ = PolyModulus(parms_.poly_modulus().pointer(), coeff_count, 
+            parms_.poly_modulus().coeff_uint64_count());
 
         // Reserve space for all of the primitive roots
         roots_of_unity_ = allocate_uint(slots_, pool_);
@@ -67,7 +68,8 @@ namespace seal
 
         // Set mod_ and polymod_
         mod_ = parms_.plain_modulus();
-        polymod_ = PolyModulus(parms_.poly_modulus().pointer(), parms_.poly_modulus().coeff_count(), parms_.poly_modulus().coeff_uint64_count());
+        polymod_ = PolyModulus(parms_.poly_modulus().pointer(), parms_.poly_modulus().coeff_count(), 
+            parms_.poly_modulus().coeff_uint64_count());
     }
 
     void PolyCRTBuilder::populate_roots_of_unity_vector()
@@ -145,12 +147,54 @@ namespace seal
         inverse_ntt_negacyclic_harvey(destination.pointer(), ntt_tables_);
     }
 
+    void PolyCRTBuilder::compose(const vector<int64_t> &values_matrix, Plaintext &destination)
+    {
+        // Validate input parameters
+        if (values_matrix.size() > slots_)
+        {
+            throw logic_error("values_matrix size is too large");
+        }
+
+        uint64_t plain_modulus_div_two = mod_.value() >> 1;
+#ifdef SEAL_DEBUG
+        for (int i = 0; i < slots_; i++)
+        {
+            // Validate the i-th input
+            if (abs(values_matrix[i]) > plain_modulus_div_two)
+            {
+                throw invalid_argument("input value is larger than plain_modulus");
+            }
+        }
+#endif
+        int input_matrix_size = values_matrix.size();
+
+        // Set destination to full size
+        destination.resize(slots_);
+
+        // First write the values to destination coefficients. Read 
+        // in top row, then bottom row.
+        for (int i = 0; i < input_matrix_size; i++)
+        {
+            *(destination.pointer() + matrix_reps_index_map_[i]) = (values_matrix[i] > plain_modulus_div_two) ? 
+                (mod_.value() - values_matrix[i]) : values_matrix[i];
+        }
+        for (int i = input_matrix_size; i < slots_; i++)
+        {
+            *(destination.pointer() + matrix_reps_index_map_[i]) = 0;
+        }
+
+        // Transform destination using inverse of negacyclic NTT
+        // Note: We already performed bit-reversal when reading in the matrix
+        inverse_ntt_negacyclic_harvey(destination.pointer(), ntt_tables_);
+    }
+
     void PolyCRTBuilder::compose(Plaintext &plain, const MemoryPoolHandle &pool)
     {
         int coeff_count = parms_.poly_modulus().coeff_count();
 
         // Validate input parameters
-        if (plain.coeff_count() > coeff_count || (plain.coeff_count() == coeff_count && plain[coeff_count - 1] != 0))
+        if (plain.coeff_count() > coeff_count || 
+            (plain.coeff_count() == coeff_count && plain[coeff_count - 1] != 0))
         {
             throw invalid_argument("plain is not valid for encryption parameters");
         }
@@ -197,7 +241,8 @@ namespace seal
         int coeff_count = parms_.poly_modulus().coeff_count();
 
         // Validate input parameters
-        if (plain.coeff_count() > coeff_count || (plain.coeff_count() == coeff_count && plain[coeff_count - 1] != 0))
+        if (plain.coeff_count() > coeff_count || 
+            (plain.coeff_count() == coeff_count && plain[coeff_count - 1] != 0))
         {
             throw invalid_argument("plain is not valid for encryption parameters");
         }
@@ -235,12 +280,61 @@ namespace seal
         }
     }
 
+    void PolyCRTBuilder::decompose(const Plaintext &plain, vector<int64_t> &destination,
+        const MemoryPoolHandle &pool)
+    {
+        int coeff_count = parms_.poly_modulus().coeff_count();
+
+        // Validate input parameters
+        if (plain.coeff_count() > coeff_count || 
+            (plain.coeff_count() == coeff_count && plain[coeff_count - 1] != 0))
+        {
+            throw invalid_argument("plain is not valid for encryption parameters");
+        }
+#ifdef SEAL_DEBUG
+        if (plain.significant_coeff_count() >= coeff_count || !are_poly_coefficients_less_than(plain.pointer(),
+            plain.coeff_count(), 1, parms_.plain_modulus().pointer(), parms_.plain_modulus().uint64_count()))
+        {
+            throw invalid_argument("plain is not valid for encryption parameters");
+        }
+#endif
+        if (!pool)
+        {
+            throw invalid_argument("pool is uninitialized");
+        }
+
+        // Set destination size
+        destination.resize(slots_);
+
+        // Never include the leading zero coefficient (if present)
+        int plain_coeff_count = min(plain.coeff_count(), slots_);
+
+        Pointer temp_dest(allocate_uint(slots_, pool));
+
+        // Make a copy of poly
+        set_uint_uint(plain.pointer(), plain_coeff_count, temp_dest.get());
+        set_zero_uint(slots_ - plain_coeff_count, temp_dest.get() + plain_coeff_count);
+
+        // Transform destination using negacyclic NTT.
+        ntt_negacyclic_harvey(temp_dest.get(), ntt_tables_);
+
+        // Read top row, then bottom row
+        int plain_modulus_div_two = mod_.value() >> 1;
+        for (int i = 0; i < slots_; i++)
+        {
+            uint64_t curr_value = temp_dest[matrix_reps_index_map_[i]];
+            destination[i] = (curr_value > plain_modulus_div_two) ?
+                (curr_value - mod_.value()) : curr_value;
+        }
+    }
+
     void PolyCRTBuilder::decompose(Plaintext &plain, const MemoryPoolHandle &pool)
     {
         int coeff_count = parms_.poly_modulus().coeff_count();
 
         // Validate input parameters
-        if (plain.coeff_count() > coeff_count || (plain.coeff_count() == coeff_count && plain[coeff_count - 1] != 0))
+        if (plain.coeff_count() > coeff_count || 
+            (plain.coeff_count() == coeff_count && plain[coeff_count - 1] != 0))
         {
             throw invalid_argument("plain is not valid for encryption parameters");
         }
@@ -273,7 +367,7 @@ namespace seal
         // set to zero).
         plain.resize(slots_);
 
-        // Read top row
+        // Read top row, then bottom row
         for (int i = 0; i < slots_; i++)
         {
             *(plain.pointer() + i) = temp[matrix_reps_index_map_[i]];
