@@ -33,9 +33,10 @@ namespace seal
                 throw std::invalid_argument("modulus");
             }
 #endif
-            for (int i = 0; i < coeff_count; i++)
+            const std::uint64_t modulus_value = modulus.value();
+            for (std::uint64_t i = 0; i < coeff_count; i++)
             {
-                result[i] = poly[i] % modulus.value();
+                *result++ = *poly++ % modulus_value;
             }
         }
 
@@ -60,9 +61,19 @@ namespace seal
                 throw std::invalid_argument("result");
             }
 #endif
+            const uint64_t modulus_value = modulus.value();
             for (int i = 0; i < coeff_count; i++)
             {
-                result[i] = negate_uint_mod(poly[i], modulus);
+                // Explicit inline
+                //*result++ = negate_uint_mod(*poly++, modulus);
+#ifdef SEAL_DEBUG
+                if (*poly >= modulus_value)
+                {
+                    throw std::out_of_range("poly");
+                }
+#endif
+                std::int64_t non_zero = (*poly != 0);
+                *result++ = (modulus_value - *poly++) & static_cast<std::uint64_t>(-non_zero);
             }
         }
 
@@ -91,9 +102,23 @@ namespace seal
                 throw std::invalid_argument("result");
             }
 #endif
+            const uint64_t modulus_value = modulus.value();
             for (int i = 0; i < coeff_count; i++)
             {
-                result[i] = add_uint_uint_mod(operand1[i], operand2[i], modulus);
+                // Explicit inline
+                //result[i] = add_uint_uint_mod(operand1[i], operand2[i], modulus);
+#ifdef SEAL_DEBUG
+                if (*operand1 >= modulus_value)
+                {
+                    throw std::out_of_range("operand1");
+                }
+                if (*operand2 >= modulus_value)
+                {
+                    throw std::out_of_range("operand2");
+                }
+#endif
+                std::uint64_t sum = *operand1++ + *operand2++;
+                *result++ = sum - (modulus_value & static_cast<std::uint64_t>(-static_cast<std::int64_t>(sum >= modulus_value)));
             }
         }
 
@@ -122,9 +147,23 @@ namespace seal
                 throw std::invalid_argument("result");
             }
 #endif
+            const uint64_t modulus_value = modulus.value();
             for (int i = 0; i < coeff_count; i++)
             {
-                result[i] = sub_uint_uint_mod(operand1[i], operand2[i], modulus);
+                // Explicit inline
+                //result[i] = sub_uint_uint_mod(operand1[i], operand2[i], modulus);
+#ifdef SEAL_DEBUG
+                if (*operand1 >= modulus_value)
+                {
+                    throw std::out_of_range("operand1");
+                }
+                if (*operand2 >= modulus_value)
+                {
+                    throw std::out_of_range("operand2");
+                }
+#endif
+                std::int64_t borrow = SEAL_SUB_BORROW_UINT64(*operand1++, *operand2++, 0, result);
+                *result++ += (modulus_value & static_cast<std::uint64_t>(-borrow));
             }
         }
 
@@ -152,9 +191,39 @@ namespace seal
 #ifdef SEAL_VECTORIZATION_HINTS
             multiply_uint_scalar_mod_vector(poly, coeff_count, scalar, modulus, result);
 #else
+            std::uint64_t z[2];
+            const std::uint64_t modulus_value = modulus.value();
+            const std::uint64_t const_ratio_0 = modulus.const_ratio()[0];
+            const std::uint64_t const_ratio_1 = modulus.const_ratio()[1];
             for (int i = 0; i < coeff_count; i++)
             {
-                result[i] = multiply_uint_uint_mod(poly[i], scalar, modulus);
+                // Explicit inline
+                //*result++ = multiply_uint_uint_mod(*poly++, scalar, modulus);
+
+                multiply_uint64(*poly++, scalar, z);
+            
+                // Reduces z using base 2^64 Barrett reduction
+                std::uint64_t tmp1, tmp2[2], tmp3, carry;
+
+                // Multiply input and const_ratio
+                // Round 1
+                multiply_uint64_hw64(z[0], const_ratio_0, &carry);
+
+                multiply_uint64(z[0], const_ratio_1, tmp2);
+                tmp3 = tmp2[1] + add_uint64(tmp2[0], carry, 0, &tmp1);
+
+                // Round 2
+                multiply_uint64(z[1], const_ratio_0, tmp2);
+                carry = tmp2[1] + add_uint64(tmp1, tmp2[0], 0, &tmp1);
+
+                // This is all we care about
+                tmp1 = z[1] * const_ratio_1 + tmp3 + carry;
+
+                // Barrett subtraction
+                tmp3 = z[0] - tmp1 * modulus_value;
+
+                // Claim: One more subtraction is enough
+                *result++ = tmp3 - (modulus_value & static_cast<uint64_t>(-static_cast<std::int64_t>(tmp3 >= modulus_value)));
             }
 #endif
         }
@@ -257,18 +326,21 @@ namespace seal
                 throw std::invalid_argument("modulus");
             }
 #endif
-            std::uint64_t coeff_count = 1ULL << coeff_count_power;
-            for (std::uint64_t i = 0; i < coeff_count; i++)
+            const std::uint64_t modulus_value = modulus.value();
+            std::uint64_t coeff_count_minus_one = (1ULL << coeff_count_power) - 1;
+            for (std::uint64_t i = 0; i <= coeff_count_minus_one; i++)
             {
                 std::uint64_t index_raw = i * galois_elt;
-                std::uint64_t index = index_raw & (coeff_count - 1);
-                std::uint64_t multiples = index_raw >> coeff_count_power;
-
-                result[index] = input[i];
-                if (multiples & 1)
+                std::uint64_t index = index_raw & coeff_count_minus_one;
+                std::uint64_t result_value = *input++;
+                if ((index_raw >> coeff_count_power) & 1)
                 {
-                    result[index] = negate_uint_mod(result[index], modulus);
+                    // Explicit inline
+                    //result[index] = negate_uint_mod(result[index], modulus);
+                    std::int64_t non_zero = (result_value != 0);
+                    result_value = (modulus_value - result_value) & static_cast<std::uint64_t>(-non_zero);
                 }
+                result[index] = result_value;
             }
         }
 
@@ -299,12 +371,12 @@ namespace seal
             }
 #endif
             std::uint32_t coeff_count = 1U << coeff_count_power;
-            std::uint32_t m = 2 * coeff_count;
+            std::uint32_t m_minus_one = 2 * coeff_count;
             for (std::uint32_t i = 0; i < coeff_count; i++)
             {
                 std::uint32_t reversed = reverse_bits(i, coeff_count_power);
                 std::uint64_t index_raw = galois_elt * (2 * reversed + 1);
-                index_raw &= (m - 1);
+                index_raw &= m_minus_one;
                 std::uint32_t index = reverse_bits((static_cast<std::uint32_t>(index_raw) - 1) >> 1, coeff_count_power);
                 result[i] = input[index];
             }
