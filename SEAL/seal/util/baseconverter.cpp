@@ -238,7 +238,7 @@ namespace seal
             {
                 for (int j = 0; j < aux_base_mod_count_; j++)
                 {
-                    aux_base_products_mod_coeff_array_[i][j] = modulo_uint(aux_products_array.get() + (j * aux_products_uint64_count), 
+                    aux_base_products_mod_coeff_array_[j][i] = modulo_uint(aux_products_array.get() + (j * aux_products_uint64_count), 
                         aux_products_uint64_count, coeff_base_array_[i], pool_);
                 }
             }
@@ -508,7 +508,7 @@ namespace seal
                     for (int i = 0; i < aux_base_mod_count_; i++)
                     {
                         //uint64_t aux_transition;
-                        //multiply_uint64_mod(temp_coeff_transition.get() + k + (i * coeff_count_), &aux_base_products_mod_coeff_array_[j][i], coeff_base_array_[j], &aux_transition);
+                        //multiply_uint64_mod(temp_coeff_transition.get() + k + (i * coeff_count_), &aux_base_products_mod_coeff_array_[i][j], coeff_base_array_[j], &aux_transition);
                         //add_uint_uint_smallmod(&aux_transition, destination + (k + j * coeff_count_), coeff_base_array_[j], destination + (k + j * coeff_count_));
 
                         // Lazy reduction
@@ -516,7 +516,7 @@ namespace seal
 
                         // Product is 61 bit + 60 bit = 121 bit, so can sum up to 127 of them with no reduction
                         // Thus need aux_base_mod_count_ <= 127, so coeff_base_mod_count_ <= 126 to guarantee success
-                        multiply_uint64(temp_coeff_transition[k + (i * coeff_count_)], aux_base_products_mod_coeff_array_[j][i], temp);
+                        multiply_uint64(temp_coeff_transition[k + (i * coeff_count_)], aux_base_products_mod_coeff_array_[i][j], temp);
                         unsigned char carry = add_uint64(aux_transition[0], temp[0], 0, aux_transition);
                         aux_transition[1] += temp[1] + carry;
                     }
