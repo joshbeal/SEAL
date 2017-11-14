@@ -117,10 +117,10 @@ namespace seal
             throw logic_error("values_matrix size is too large");
         }
 #ifdef SEAL_DEBUG
-        for (int i = 0; i < slots_; i++)
+        for (auto v : values_matrix)
         {
             // Validate the i-th input
-            if (values_matrix[i] >= mod_.value())
+            if (v >= mod_.value())
             {
                 throw invalid_argument("input value is larger than plain_modulus");
             }
@@ -157,10 +157,10 @@ namespace seal
 
         uint64_t plain_modulus_div_two = mod_.value() >> 1;
 #ifdef SEAL_DEBUG
-        for (int i = 0; i < slots_; i++)
+        for (auto v : values_matrix)
         {
             // Validate the i-th input
-            if (abs(values_matrix[i]) > plain_modulus_div_two)
+            if (abs(v) > plain_modulus_div_two)
             {
                 throw invalid_argument("input value is larger than plain_modulus");
             }
@@ -175,8 +175,8 @@ namespace seal
         // in top row, then bottom row.
         for (int i = 0; i < input_matrix_size; i++)
         {
-            *(destination.pointer() + matrix_reps_index_map_[i]) = (values_matrix[i] > plain_modulus_div_two) ? 
-                (mod_.value() - values_matrix[i]) : values_matrix[i];
+            *(destination.pointer() + matrix_reps_index_map_[i]) = (values_matrix[i] < 0) ? 
+                (mod_.value() + values_matrix[i]) : values_matrix[i];
         }
         for (int i = input_matrix_size; i < slots_; i++)
         {
