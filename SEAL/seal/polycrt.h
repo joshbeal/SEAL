@@ -94,15 +94,15 @@ namespace seal
         /**
         Creates a SEAL plaintext from a given matrix. This function "batches" a given matrix
         of integers modulo the plaintext modulus into a SEAL plaintext element, and stores 
-        the result in the destination parameter. The input vector must have size equal to
-        the degree of the polynomial modulus. The first half of the elements represent the
+        the result in the destination parameter. The input vector must have size at most equal
+        to the degree of the polynomial modulus. The first half of the elements represent the
         first row of the matrix, and the second half represent the second row. The numbers
         in the matrix can be at most equal to the plaintext modulus for it to represent 
         a valid SEAL plaintext.
 
         @param[in] values The matrix of integers modulo plaintext modulus to batch
         @param[out] destination The plaintext polynomial to overwrite with the result
-        @throws std::invalid_argument if values has incorrect size
+        @throws std::invalid_argument if values is too large
         */
         void compose(const std::vector<std::uint64_t> &values, Plaintext &destination);
         

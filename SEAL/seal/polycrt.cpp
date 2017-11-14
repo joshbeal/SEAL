@@ -109,20 +109,11 @@ namespace seal
 
     void PolyCRTBuilder::compose(const vector<uint64_t> &values_matrix, Plaintext &destination)
     {
-        int coeff_count = parms_.poly_modulus().coeff_count();
-        uint64_t row_size = slots_ >> 1;
-
         // Validate input parameters
-        if (values_matrix.size() != slots_)
+        if (values_matrix.size() > slots_)
         {
-            throw logic_error("values_matrix size is not correct");
+            throw logic_error("values_matrix size is too large");
         }
-
-        // Set destination to full size
-        destination.resize(coeff_count);
-
-        // Set leading coefficient to zero
-        destination[slots_] = 0;
 #ifdef SEAL_DEBUG
         for (int i = 0; i < slots_; i++)
         {
@@ -133,11 +124,20 @@ namespace seal
             }
         }
 #endif
+        int input_matrix_size = values_matrix.size();
+
+        // Set destination to full size
+        destination.resize(slots_);
+
         // First write the values to destination coefficients. Read 
         // in top row, then bottom row.
-        for (int i = 0; i < slots_; i++)
+        for (int i = 0; i < input_matrix_size; i++)
         {
-            destination[matrix_reps_index_map_[i]] = values_matrix[i];
+            *(destination.pointer() + matrix_reps_index_map_[i]) = values_matrix[i];
+        }        
+        for (int i = input_matrix_size; i < slots_; i++)
+        {
+            *(destination.pointer() + matrix_reps_index_map_[i]) = 0;
         }
 
         // Transform destination using inverse of negacyclic NTT
@@ -148,7 +148,6 @@ namespace seal
     void PolyCRTBuilder::compose(Plaintext &plain, const MemoryPoolHandle &pool)
     {
         int coeff_count = parms_.poly_modulus().coeff_count();
-        uint64_t row_size = slots_ >> 1;
 
         // Validate input parameters
         if (plain.coeff_count() > coeff_count || (plain.coeff_count() == coeff_count && plain[coeff_count - 1] != 0))
@@ -173,8 +172,7 @@ namespace seal
         Pointer temp(allocate_uint(input_plain_coeff_count, pool));
         set_uint_uint(plain.pointer(), input_plain_coeff_count, temp.get());
 
-        // Set plain to full slot count size (note that all new coefficients are 
-        // set to zero).
+        // Set plain to full slot count size.
         plain.resize(slots_);
 
         // First write the values to destination coefficients. Read 
@@ -182,6 +180,10 @@ namespace seal
         for (int i = 0; i < input_plain_coeff_count; i++)
         {
             *(plain.pointer() + matrix_reps_index_map_[i]) = temp[i];
+        }
+        for (int i = input_plain_coeff_count; i < slots_; i++)
+        {
+            *(plain.pointer() + matrix_reps_index_map_[i]) = 0;
         }
 
         // Transform destination using inverse of negacyclic NTT
@@ -193,7 +195,6 @@ namespace seal
         const MemoryPoolHandle &pool) 
     {
         int coeff_count = parms_.poly_modulus().coeff_count();
-        uint64_t row_size = slots_ >> 1;
 
         // Validate input parameters
         if (plain.coeff_count() > coeff_count || (plain.coeff_count() == coeff_count && plain[coeff_count - 1] != 0))
@@ -237,7 +238,6 @@ namespace seal
     void PolyCRTBuilder::decompose(Plaintext &plain, const MemoryPoolHandle &pool)
     {
         int coeff_count = parms_.poly_modulus().coeff_count();
-        uint64_t row_size = slots_ >> 1;
 
         // Validate input parameters
         if (plain.coeff_count() > coeff_count || (plain.coeff_count() == coeff_count && plain[coeff_count - 1] != 0))

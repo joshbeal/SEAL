@@ -114,15 +114,15 @@ namespace Microsoft
                 <remarks>
                 Creates a SEAL plaintext from a given matrix. This function "batches" a given matrix
                 of integers modulo the plaintext modulus into a SEAL plaintext element, and stores
-                the result in the destination parameter. The input System::List must have size equal 
-                to the degree of the polynomial modulus. The first half of the elements represent the
-                first row of the matrix, and the second half represent the second row. The numbers
+                the result in the destination parameter. The input System::List must have size at most 
+                equal to the degree of the polynomial modulus. The first half of the elements represent
+                the first row of the matrix, and the second half represent the second row. The numbers
                 in the matrix can be at most equal to the plaintext modulus for it to represent
                 a valid SEAL plaintext.
                 </remarks>
                 <param name="values">The matrix of integers modulo plaintext modulus to batch</param>
                 <param name="destination">The plaintext polynomial to overwrite with the result</param>
-                <exception cref="System::ArgumentException">if values has incorrect size</exception>
+                <exception cref="System::ArgumentException">if values is too large</exception>
                 <exception cref="System::ArgumentNullException">if values or destination is 
                 null</exception>
                 */
