@@ -227,7 +227,7 @@ namespace seal
             }
 
             // Add qi mod msk at the end of the array
-            for (int i = 0; i < aux_base_mod_count_; i++)
+            for (int i = 0; i < coeff_base_mod_count_; i++)
             {
                 coeff_base_products_mod_aux_bsk_array_[i][aux_base_mod_count_] = modulo_uint(coeff_products_array.get() + (i * coeff_products_uint64_count), 
                     coeff_products_uint64_count, m_sk_, pool_);
