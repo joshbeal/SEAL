@@ -319,10 +319,10 @@ namespace seal
         ntt_negacyclic_harvey(temp_dest.get(), ntt_tables_);
 
         // Read top row, then bottom row
-        int plain_modulus_div_two = mod_.value() >> 1;
+        uint64_t plain_modulus_div_two = mod_.value() >> 1;
         for (int i = 0; i < slots_; i++)
         {
-            uint64_t curr_value = temp_dest[matrix_reps_index_map_[i]];
+            int64_t curr_value = temp_dest[matrix_reps_index_map_[i]];
             destination[i] = (curr_value > plain_modulus_div_two) ?
                 (curr_value - mod_.value()) : curr_value;
         }
