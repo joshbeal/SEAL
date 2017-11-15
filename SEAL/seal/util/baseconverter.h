@@ -61,7 +61,7 @@ namespace seal
             /**
             Fast base converter from q to plain_modulus U {gamma}
             */
-            void fastbconv_plain_gamma(const std::uint64_t *input, std::uint64_t *destination) const;
+            void fastbconv_plain_gamma(const std::uint64_t *input, std::uint64_t *destination, const MemoryPoolHandle &pool) const;
 
             void reset();
 
