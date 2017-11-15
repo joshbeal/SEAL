@@ -97,10 +97,11 @@ namespace seal
             neg_inv_coeff_products_all_mod_plain_gamma_array_.resize(plain_gamma_count_);
             plain_gamma_product_mod_coeff_array_.resize(coeff_base_mod_count_);
 
-            coeff_base_products_mod_aux_bsk_array_.resize(coeff_base_mod_count_);
-            for (int i = 0; i < coeff_base_mod_count_; i++)
+            // We use a reversed order here for performance reasons
+            coeff_base_products_mod_aux_bsk_array_.resize(bsk_base_mod_count_);
+            for (int i = 0; i < bsk_base_mod_count_; i++)
             {
-                coeff_base_products_mod_aux_bsk_array_[i].resize(bsk_base_mod_count_);
+                coeff_base_products_mod_aux_bsk_array_[i].resize(coeff_base_mod_count_);
             }
 
             aux_base_products_mod_coeff_array_.resize(aux_base_mod_count_);
@@ -221,7 +222,7 @@ namespace seal
             {
                 for (int j = 0; j < coeff_base_mod_count_; j++)
                 {
-                    coeff_base_products_mod_aux_bsk_array_[j][i] = modulo_uint(coeff_products_array.get() + (j * coeff_products_uint64_count), 
+                    coeff_base_products_mod_aux_bsk_array_[i][j] = modulo_uint(coeff_products_array.get() + (j * coeff_products_uint64_count), 
                         coeff_products_uint64_count, aux_base_array_[i], pool_);
                 }
             }
@@ -229,7 +230,7 @@ namespace seal
             // Add qi mod msk at the end of the array
             for (int i = 0; i < coeff_base_mod_count_; i++)
             {
-                coeff_base_products_mod_aux_bsk_array_[i][aux_base_mod_count_] = modulo_uint(coeff_products_array.get() + (i * coeff_products_uint64_count), 
+                coeff_base_products_mod_aux_bsk_array_[aux_base_mod_count_][i] = modulo_uint(coeff_products_array.get() + (i * coeff_products_uint64_count),
                     coeff_products_uint64_count, m_sk_, pool_);
             }
 
@@ -433,38 +434,37 @@ namespace seal
              Ensure: Output in Bsk = {m1,...,ml} U {msk}
             */
             Pointer temp_coeff_transition(allocate_uint(coeff_count_ * coeff_base_mod_count_, pool));
-
             for (int i = 0; i < coeff_base_mod_count_; i++)
             {
+                uint64_t inv_coeff_base_products_mod_coeff_elt = inv_coeff_base_products_mod_coeff_array_[i];
+                SmallModulus coeff_base_array_elt = coeff_base_array_[i];
                 for (int k = 0; k < coeff_count_; k++)
                 {
-                    temp_coeff_transition[k + (i * coeff_count_)] = multiply_uint_uint_mod(input[k + (i * coeff_count_)], inv_coeff_base_products_mod_coeff_array_[i], coeff_base_array_[i]);
+                    temp_coeff_transition[i + (k * coeff_base_mod_count_)] = multiply_uint_uint_mod(*input++,
+                        inv_coeff_base_products_mod_coeff_elt, coeff_base_array_elt);
                 }
             }
 
             for (int j = 0; j < bsk_base_mod_count_; j++)
             {
+                uint64_t *temp_coeff_transition_ptr = temp_coeff_transition.get();
+                SmallModulus bsk_base_array_elt = bsk_base_array_[j];
+                vector<uint64_t> curr_coeff_base_products_mod_aux_bsk_array = coeff_base_products_mod_aux_bsk_array_[j];
                 for (int k = 0; k < coeff_count_; k++)
                 {
                     uint64_t aux_transition[2]{ 0 };
                     for (int i = 0; i < coeff_base_mod_count_; i++)
                     {
-                        {
-                            //uint64_t aux_transition;
-                            //multiply_uint64_mod(temp_coeff_transition.get() + k, &coeff_base_products_mod_aux_bsk_array_[i][j], bsk_base_array_[j], &aux_transition);
-                            //add_uint_uint_smallmod(&aux_transition, destination + (k + j * coeff_count_), bsk_base_array_[j], destination + (k + j * coeff_count_));
+                        // Lazy reduction
+                        uint64_t temp[2];
 
-                            // Lazy reduction
-                            uint64_t temp[2];
-
-                            // Product is 60 bit + 61 bit = 121 bit, so can sum up to 127 of them with no reduction
-                            // Thus need coeff_base_mod_count_ <= 127 to guarantee success
-                            multiply_uint64(temp_coeff_transition[k + (i * coeff_count_)], coeff_base_products_mod_aux_bsk_array_[i][j], temp);
-                            unsigned char carry = add_uint64(aux_transition[0], temp[0], 0, aux_transition);
-                            aux_transition[1] += temp[1] + carry;
-                        }
+                        // Product is 60 bit + 61 bit = 121 bit, so can sum up to 127 of them with no reduction
+                        // Thus need coeff_base_mod_count_ <= 127 to guarantee success
+                        multiply_uint64(*temp_coeff_transition_ptr++, curr_coeff_base_products_mod_aux_bsk_array[i], temp);
+                        unsigned char carry = add_uint64(aux_transition[0], temp[0], 0, aux_transition);
+                        aux_transition[1] += temp[1] + carry;
                     }
-                    destination[k + (j * coeff_count_)] = barrett_reduce_128(aux_transition, bsk_base_array_[j]);
+                    *destination++ = barrett_reduce_128(aux_transition, bsk_base_array_elt);
                 }
             }
         }
@@ -731,7 +731,7 @@ namespace seal
                     {
                         //uint64_t aux_transition;
                         //multiply_uint64_mod(temp_coeff_transition.get() + k + (i * coeff_count_), 
-                        //  &coeff_base_products_mod_aux_bsk_array_[i][j], bsk_base_array_[j], &aux_transition);
+                        //  &coeff_base_products_mod_aux_bsk_array_[j][i], bsk_base_array_[j], &aux_transition);
                         //add_uint_uint_smallmod(&aux_transition, destination + (k + j * coeff_count_), bsk_base_array_[j], 
                         // destination + (k + j * coeff_count_));
 
@@ -741,7 +741,7 @@ namespace seal
                         // Product is 60 bit + 61 bit = 121 bit, so can sum up to 127 of them with no reduction
                         // Thus need coeff_base_mod_count_ <= 127
                         multiply_uint64(temp_coeff_transition[k + (i * coeff_count_)], 
-                            coeff_base_products_mod_aux_bsk_array_[i][j], temp);
+                            coeff_base_products_mod_aux_bsk_array_[j][i], temp);
                         unsigned char carry = add_uint64(aux_transition[0], temp[0], 0, aux_transition);
                         aux_transition[1] += temp[1] + carry;
                     }

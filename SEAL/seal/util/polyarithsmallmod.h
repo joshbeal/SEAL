@@ -191,15 +191,17 @@ namespace seal
 #ifdef SEAL_VECTORIZATION_HINTS
             multiply_uint_scalar_mod_vector(poly, coeff_count, scalar, modulus, result);
 #else
-            std::uint64_t z[2];
+            // Explicit inline
+            //for (int i = 0; i < coeff_count; i++)
+            //{
+            //    *result++ = multiply_uint_uint_mod(*poly++, scalar, modulus);
+            //}
             const std::uint64_t modulus_value = modulus.value();
             const std::uint64_t const_ratio_0 = modulus.const_ratio()[0];
             const std::uint64_t const_ratio_1 = modulus.const_ratio()[1];
             for (int i = 0; i < coeff_count; i++)
             {
-                // Explicit inline
-                //*result++ = multiply_uint_uint_mod(*poly++, scalar, modulus);
-
+                std::uint64_t z[2];
                 multiply_uint64(*poly++, scalar, z);
             
                 // Reduces z using base 2^64 Barrett reduction
@@ -410,9 +412,41 @@ namespace seal
 #ifdef SEAL_VECTORIZATION_HINTS
             multiply_uint_uint_mod_vector(operand1, operand2, coeff_count, modulus, result);
 #else
+            // Explicit inline
+            //for (int i = 0; i < coeff_count; i++)
+            //{
+            //    *result++ = multiply_uint_uint_mod(*operand1++, *operand2++, modulus);
+            //}
+            const std::uint64_t modulus_value = modulus.value();
+            const std::uint64_t const_ratio_0 = modulus.const_ratio()[0];
+            const std::uint64_t const_ratio_1 = modulus.const_ratio()[1];
             for (int i = 0; i < coeff_count; i++)
             {
-                *result++ = multiply_uint_uint_mod(*operand1++, *operand2++, modulus);
+                std::uint64_t z[2];
+                multiply_uint64(*operand1++, *operand2++, z);
+
+                // Reduces z using base 2^64 Barrett reduction
+                std::uint64_t tmp1, tmp2[2], tmp3, carry;
+
+                // Multiply input and const_ratio
+                // Round 1
+                multiply_uint64_hw64(z[0], const_ratio_0, &carry);
+
+                multiply_uint64(z[0], const_ratio_1, tmp2);
+                tmp3 = tmp2[1] + add_uint64(tmp2[0], carry, 0, &tmp1);
+
+                // Round 2
+                multiply_uint64(z[1], const_ratio_0, tmp2);
+                carry = tmp2[1] + add_uint64(tmp1, tmp2[0], 0, &tmp1);
+
+                // This is all we care about
+                tmp1 = z[1] * const_ratio_1 + tmp3 + carry;
+
+                // Barrett subtraction
+                tmp3 = z[0] - tmp1 * modulus_value;
+
+                // Claim: One more subtraction is enough
+                *result++ = tmp3 - (modulus_value & static_cast<uint64_t>(-static_cast<std::int64_t>(tmp3 >= modulus_value)));
             }
 #endif
         }
