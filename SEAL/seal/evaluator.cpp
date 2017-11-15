@@ -983,63 +983,86 @@ namespace seal
                 inv_coeff_products_mod_coeff_array_[i], coeff_modulus_[i], encrypted_coeff_prod_inv_coeff.get());
 
             int shift = 0;
-            for (int k = 0; k < evaluation_keys.data()[0][i].size(); k += 2)
+            const Ciphertext &key_component_ref = evaluation_keys.data()[0][i];
+            int keys_size = key_component_ref.size();
+            for (int k = 0; k < keys_size; k += 2)
             {
+                const uint64_t *key_ptr_0 = key_component_ref.pointer(k);
+                const uint64_t *key_ptr_1 = key_component_ref.pointer(k + 1);
+
                 // Decompose here
+                int decomposition_bit_count = evaluation_keys.decomposition_bit_count();
                 for (int coeff_index = 0; coeff_index < coeff_count; coeff_index++)
                 {
                     decomp_encrypted_last[coeff_index] = encrypted_coeff_prod_inv_coeff[coeff_index] >> shift;
-                    decomp_encrypted_last[coeff_index] &= (1ULL << evaluation_keys.decomposition_bit_count()) - 1;
+                    decomp_encrypted_last[coeff_index] &= (1ULL << decomposition_bit_count) - 1;
                 }
 
+                uint64_t *wide_innerresult0_ptr = wide_innerresult0.get();
+                uint64_t *wide_innerresult1_ptr = wide_innerresult1.get();
                 for (int j = 0; j < coeff_mod_count; j++)
                 {
-                    set_uint_uint(decomp_encrypted_last.get(), coeff_count, temp_decomp_coeff.get());
+                    uint64_t *temp_decomp_coeff_ptr = temp_decomp_coeff.get();
+                    set_uint_uint(decomp_encrypted_last.get(), coeff_count, temp_decomp_coeff_ptr);
 
                     // We don't reduce here, so might get up to two extra bits. Thus 62 bits at most.
-                    ntt_negacyclic_harvey_lazy(temp_decomp_coeff.get(), coeff_small_ntt_tables_[j]);
+                    ntt_negacyclic_harvey_lazy(temp_decomp_coeff_ptr, coeff_small_ntt_tables_[j]);
 
                     // Lazy reduction
                     uint64_t wide_innerproduct[2];
-                    for (int m = 0; m < coeff_count; m++)
+                    for (int m = 0; m < coeff_count; m++, wide_innerresult0_ptr += 2)
                     {
-                        multiply_uint64(temp_decomp_coeff[m], 
-                            *(evaluation_keys.key(encrypted_size - 1)[i].pointer(k) + (m + j * coeff_count)), wide_innerproduct);
-                        unsigned char carry = add_uint64(wide_innerresult0[2 * (m + j * coeff_count)], wide_innerproduct[0], 0, 
-                            wide_innerresult0.get() + 2 * (m + j * coeff_count));
-                        wide_innerresult0[2 * (m + j * coeff_count) + 1] += wide_innerproduct[1] + carry;
+                        multiply_uint64(*temp_decomp_coeff_ptr++, *key_ptr_0++, wide_innerproduct);
+                        unsigned char carry = add_uint64(wide_innerresult0_ptr[0], wide_innerproduct[0], 0,
+                            wide_innerresult0_ptr);
+                        wide_innerresult0_ptr[1] += wide_innerproduct[1] + carry;
+                    }
 
-                        multiply_uint64(temp_decomp_coeff[m],
-                            *(evaluation_keys.key(encrypted_size - 1)[i].pointer(k + 1) + (m + j * coeff_count)), wide_innerproduct);
-                        carry = add_uint64(wide_innerresult1[2 * (m + j * coeff_count)], wide_innerproduct[0], 0,
-                            wide_innerresult1.get() + 2 * (m + j * coeff_count));
-                        wide_innerresult1[2 * (m + j * coeff_count) + 1] += wide_innerproduct[1] + carry;
+                    temp_decomp_coeff_ptr = temp_decomp_coeff.get();
+                    for (int m = 0; m < coeff_count; m++, wide_innerresult1_ptr += 2)
+                    {
+                        multiply_uint64(*temp_decomp_coeff_ptr++, *key_ptr_1++, wide_innerproduct);
+                        unsigned char carry = add_uint64(wide_innerresult1_ptr[0], wide_innerproduct[0], 0,
+                            wide_innerresult1_ptr);
+                        wide_innerresult1_ptr[1] += wide_innerproduct[1] + carry;
                     }
                 }
-
-                shift += evaluation_keys.decomposition_bit_count();
+                shift += decomposition_bit_count;
             }
         }
 
-        for (int i = 0; i < coeff_mod_count; i++)
+        uint64_t *innerresult_poly_ptr = innerresult.get();
+        uint64_t *wide_innerresult_poly_ptr = wide_innerresult0.get();
+        uint64_t *encrypted_ptr = encrypted;
+        uint64_t *innerresult_coeff_ptr = innerresult_poly_ptr;
+        uint64_t *wide_innerresult_coeff_ptr = wide_innerresult_poly_ptr;
+        for (int i = 0; i < coeff_mod_count; i++, innerresult_poly_ptr += coeff_count,
+            wide_innerresult_poly_ptr += 2 * coeff_count, encrypted_ptr += coeff_count)
         {
-            for (int m = 0; m < coeff_count; m++)
+            for (int m = 0; m < coeff_count; m++, wide_innerresult_coeff_ptr += 2)
             {
-                innerresult[m + (i * coeff_count)] = barrett_reduce_128(wide_innerresult0.get() + 2 * (m + i * coeff_count), 
-                    coeff_modulus_[i]);
+                *innerresult_coeff_ptr++ = barrett_reduce_128(wide_innerresult_coeff_ptr, coeff_modulus_[i]);
             }
-            inverse_ntt_negacyclic_harvey(innerresult.get() + (i * coeff_count), coeff_small_ntt_tables_[i]);
-            add_poly_poly_coeffmod(encrypted + (i * coeff_count), innerresult.get() + (i * coeff_count), 
-                coeff_count, coeff_modulus_[i], encrypted + (i * coeff_count));
+            inverse_ntt_negacyclic_harvey(innerresult_poly_ptr, coeff_small_ntt_tables_[i]);
+            add_poly_poly_coeffmod(encrypted_ptr, innerresult_poly_ptr, coeff_count,
+                coeff_modulus_[i], encrypted_ptr);
+        }
 
-            for (int m = 0; m < coeff_count; m++)
+        innerresult_poly_ptr = innerresult.get();
+        wide_innerresult_poly_ptr = wide_innerresult1.get();
+        encrypted_ptr = encrypted + array_poly_uint64_count;
+        innerresult_coeff_ptr = innerresult_poly_ptr;
+        wide_innerresult_coeff_ptr = wide_innerresult_poly_ptr;
+        for (int i = 0; i < coeff_mod_count; i++, innerresult_poly_ptr += coeff_count,
+            wide_innerresult_poly_ptr += 2 * coeff_count, encrypted_ptr += coeff_count)
+        {
+            for (int m = 0; m < coeff_count; m++, wide_innerresult_coeff_ptr += 2)
             {
-                innerresult[m + (i * coeff_count)] = barrett_reduce_128(wide_innerresult1.get() + 2 * (m + i * coeff_count), 
-                    coeff_modulus_[i]);
+                *innerresult_coeff_ptr++ = barrett_reduce_128(wide_innerresult_coeff_ptr, coeff_modulus_[i]);
             }
-            inverse_ntt_negacyclic_harvey(innerresult.get() + (i * coeff_count), coeff_small_ntt_tables_[i]);
-            add_poly_poly_coeffmod(encrypted + (i * coeff_count) + array_poly_uint64_count, innerresult.get() + (i * coeff_count), 
-                coeff_count, coeff_modulus_[i], encrypted + (i * coeff_count) + array_poly_uint64_count);
+            inverse_ntt_negacyclic_harvey(innerresult_poly_ptr, coeff_small_ntt_tables_[i]);
+            add_poly_poly_coeffmod(encrypted_ptr, innerresult_poly_ptr, coeff_count,
+                coeff_modulus_[i], encrypted_ptr);
         }
     }
 
@@ -1663,65 +1686,90 @@ namespace seal
         */
         for (int i = 0; i < coeff_mod_count; i++)
         {
-            multiply_poly_scalar_coeffmod(encrypted_coeff + (i * coeff_count), coeff_count, inv_coeff_products_mod_coeff_array_[i], 
-                coeff_modulus_[i], encrypted_coeff_prod_inv_coeff.get());
+            multiply_poly_scalar_coeffmod(encrypted_coeff + (i * coeff_count), coeff_count, 
+                inv_coeff_products_mod_coeff_array_[i], coeff_modulus_[i], encrypted_coeff_prod_inv_coeff.get());
 
             int shift = 0;
-            for (int k = 0; k < galois_keys.key(galois_elt)[i].size(); k += 2)
+            const Ciphertext &key_component_ref = galois_keys.key(galois_elt)[i];
+            int keys_size = key_component_ref.size();
+            for (int k = 0; k < keys_size; k += 2)
             {
+                const uint64_t *key_ptr_0 = key_component_ref.pointer(k);
+                const uint64_t *key_ptr_1 = key_component_ref.pointer(k + 1);
+
                 // Decompose here
+                int decomposition_bit_count = galois_keys.decomposition_bit_count();
                 for (int coeff_index = 0; coeff_index < coeff_count; coeff_index++)
                 {
                     decomp_encrypted_last[coeff_index] = encrypted_coeff_prod_inv_coeff[coeff_index] >> shift;
-                    decomp_encrypted_last[coeff_index] &= (1ULL << galois_keys.decomposition_bit_count()) - 1;
+                    decomp_encrypted_last[coeff_index] &= (1ULL << decomposition_bit_count) - 1;
                 }
 
+                uint64_t *wide_innerresult0_ptr = wide_innerresult0.get();
+                uint64_t *wide_innerresult1_ptr = wide_innerresult1.get();
                 for (int j = 0; j < coeff_mod_count; j++)
                 {
-                    set_uint_uint(decomp_encrypted_last.get(), coeff_count, temp_decomp_coeff.get());
+                    uint64_t *temp_decomp_coeff_ptr = temp_decomp_coeff.get();
+                    set_uint_uint(decomp_encrypted_last.get(), coeff_count, temp_decomp_coeff_ptr);
 
                     // We don't reduce here, so might get up to two extra bits. Thus 62 bits at most.
-                    ntt_negacyclic_harvey_lazy(temp_decomp_coeff.get(), coeff_small_ntt_tables_[j]);
+                    ntt_negacyclic_harvey_lazy(temp_decomp_coeff_ptr, coeff_small_ntt_tables_[j]);
 
                     // Lazy reduction
                     uint64_t wide_innerproduct[2];
-                    for (int m = 0; m < coeff_count; m++)
+                    for (int m = 0; m < coeff_count; m++, wide_innerresult0_ptr += 2)
                     {
-                        multiply_uint64(temp_decomp_coeff[m], *(galois_keys.key(galois_elt)[i].pointer(k) + (m + j * coeff_count)), 
-                            wide_innerproduct);
-                        unsigned char carry = add_uint64(wide_innerresult0[2 * (m + j * coeff_count)], wide_innerproduct[0], 0,
-                            wide_innerresult0.get() + 2 * (m + j * coeff_count));
-                        wide_innerresult0[2 * (m + j * coeff_count) + 1] += wide_innerproduct[1] + carry;
+                        multiply_uint64(*temp_decomp_coeff_ptr++, *key_ptr_0++, wide_innerproduct);
+                        unsigned char carry = add_uint64(wide_innerresult0_ptr[0], wide_innerproduct[0], 0,
+                            wide_innerresult0_ptr);
+                        wide_innerresult0_ptr[1] += wide_innerproduct[1] + carry;
+                    }
 
-                        multiply_uint64(temp_decomp_coeff[m], *(galois_keys.key(galois_elt)[i].pointer(k + 1) + (m + j * coeff_count)), 
-                            wide_innerproduct);
-                        carry = add_uint64(wide_innerresult1[2 * (m + j * coeff_count)], wide_innerproduct[0], 0,
-                            wide_innerresult1.get() + 2 * (m + j * coeff_count));
-                        wide_innerresult1[2 * (m + j * coeff_count) + 1] += wide_innerproduct[1] + carry;
+                    temp_decomp_coeff_ptr = temp_decomp_coeff.get();
+                    for (int m = 0; m < coeff_count; m++, wide_innerresult1_ptr += 2)
+                    {
+                        multiply_uint64(*temp_decomp_coeff_ptr++, *key_ptr_1++, wide_innerproduct);
+                        unsigned char carry = add_uint64(wide_innerresult1_ptr[0], wide_innerproduct[0], 0,
+                            wide_innerresult1_ptr);
+                        wide_innerresult1_ptr[1] += wide_innerproduct[1] + carry;
                     }
                 }
-
-                shift += galois_keys.decomposition_bit_count();
+                shift += decomposition_bit_count;
             }
         }
 
-        for (int i = 0; i < coeff_mod_count; i++)
+        uint64_t *temp_ptr = temp0.get();
+        uint64_t *innerresult_poly_ptr = innerresult.get();
+        uint64_t *wide_innerresult_poly_ptr = wide_innerresult0.get();
+        uint64_t *encrypted_ptr = encrypted.mutable_pointer();
+        uint64_t *innerresult_coeff_ptr = innerresult_poly_ptr;
+        uint64_t *wide_innerresult_coeff_ptr = wide_innerresult_poly_ptr;
+        for (int i = 0; i < coeff_mod_count; i++, innerresult_poly_ptr += coeff_count,
+            wide_innerresult_poly_ptr += 2 * coeff_count, encrypted_ptr += coeff_count,
+            temp_ptr += coeff_count)
         {
-            for (int m = 0; m < coeff_count; m++)
+            for (int m = 0; m < coeff_count; m++, wide_innerresult_coeff_ptr += 2)
             {
-                innerresult[m + (i * coeff_count)] = barrett_reduce_128(wide_innerresult0.get() + 2 * (m + i * coeff_count), 
-                    coeff_modulus_[i]);
+                *innerresult_coeff_ptr++ = barrett_reduce_128(wide_innerresult_coeff_ptr, coeff_modulus_[i]);
             }
-            inverse_ntt_negacyclic_harvey(innerresult.get() + (i * coeff_count), coeff_small_ntt_tables_[i]);
-            add_poly_poly_coeffmod(temp0.get() + (i * coeff_count), innerresult.get() + (i * coeff_count), coeff_count, coeff_modulus_[i],
-                encrypted.mutable_pointer() + (i * coeff_count));
+            inverse_ntt_negacyclic_harvey(innerresult_poly_ptr, coeff_small_ntt_tables_[i]);
+            add_poly_poly_coeffmod(temp_ptr, innerresult_poly_ptr, coeff_count,
+                coeff_modulus_[i], encrypted_ptr);
+        }
 
-            for (int m = 0; m < coeff_count; m++)
+        innerresult_poly_ptr = innerresult.get();
+        wide_innerresult_poly_ptr = wide_innerresult1.get();
+        encrypted_ptr = encrypted.mutable_pointer(1);
+        wide_innerresult_coeff_ptr = wide_innerresult_poly_ptr;
+        for (int i = 0; i < coeff_mod_count; i++, innerresult_poly_ptr += coeff_count,
+            wide_innerresult_poly_ptr += 2 * coeff_count, encrypted_ptr += coeff_count)
+        {
+            innerresult_coeff_ptr = encrypted_ptr;
+            for (int m = 0; m < coeff_count; m++, wide_innerresult_coeff_ptr += 2)
             {
-                encrypted.mutable_pointer(1)[m + (i * coeff_count)] = barrett_reduce_128(wide_innerresult1.get() + 2 * (m + i * coeff_count), 
-                    coeff_modulus_[i]);
+                *innerresult_coeff_ptr++ = barrett_reduce_128(wide_innerresult_coeff_ptr, coeff_modulus_[i]);
             }
-            inverse_ntt_negacyclic_harvey(encrypted.mutable_pointer(1) + (i * coeff_count), coeff_small_ntt_tables_[i]);
+            inverse_ntt_negacyclic_harvey(encrypted_ptr, coeff_small_ntt_tables_[i]);
         }
     }
 
