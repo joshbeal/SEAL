@@ -199,14 +199,14 @@ namespace seal
             const std::uint64_t modulus_value = modulus.value();
             const std::uint64_t const_ratio_0 = modulus.const_ratio()[0];
             const std::uint64_t const_ratio_1 = modulus.const_ratio()[1];
+            std::uint64_t z[2];
+            std::uint64_t tmp1, tmp2[2], tmp3, carry;
             for (int i = 0; i < coeff_count; i++)
             {
-                std::uint64_t z[2];
                 multiply_uint64(*poly++, scalar, z);
             
                 // Reduces z using base 2^64 Barrett reduction
-                std::uint64_t tmp1, tmp2[2], tmp3, carry;
-
+                
                 // Multiply input and const_ratio
                 // Round 1
                 multiply_uint64_hw64(z[0], const_ratio_0, &carry);

@@ -482,6 +482,9 @@ namespace seal
             Pointer tmp_first_mul_coeff_base(allocate_poly(coeff_count, coeff_mod_count, pool));
 
             // Compute c0 + c1 and c0*d0 in base q
+            uint64_t *temp_ptr_1 = tmp1_poly_coeff_base.get();
+            uint64_t *temp_ptr_2 = copy_encrypted1_ntt_coeff_mod.get();
+            uint64_t *temp_ptr_3 = temp_ptr_2 + encrypted_ptr_increment;
             for (int i = 0; i < coeff_mod_count; i++)
             {
                 //add_poly_poly_coeffmod(copy_encrypted1_ntt_coeff_mod.get() + (i * coeff_count), 
@@ -491,8 +494,7 @@ namespace seal
                 // Lazy reduction
                 for (int j = 0; j < coeff_count; j++)
                 {
-                    tmp1_poly_coeff_base[j + (i * coeff_count)] = copy_encrypted1_ntt_coeff_mod[j + (i * coeff_count)]
-                        + copy_encrypted1_ntt_coeff_mod[j + (i * coeff_count) + encrypted_ptr_increment];
+                    *temp_ptr_1++ = *temp_ptr_2++ + *temp_ptr_3++;
                 }
                 dyadic_product_coeffmod(copy_encrypted1_ntt_coeff_mod.get() + (i * coeff_count), 
                     copy_encrypted2_ntt_coeff_mod.get() + (i * coeff_count), coeff_count, coeff_modulus_[i], 
@@ -502,6 +504,9 @@ namespace seal
             Pointer tmp_first_mul_bsk_base(allocate_poly(coeff_count, bsk_base_mod_count_, pool));
 
             // Compute c0 + c1 and c0*d0 in base bsk
+            temp_ptr_1 = tmp1_poly_bsk_base.get();
+            temp_ptr_2 = copy_encrypted1_ntt_bsk_base_mod.get();
+            temp_ptr_3 = temp_ptr_2 + encrypted_bsk_ptr_increment;
             for (int i = 0; i < bsk_base_mod_count_; i++)
             {
                 //add_poly_poly_coeffmod(copy_encrypted1_ntt_bsk_base_mod.get() + (i * coeff_count), 
@@ -509,8 +514,7 @@ namespace seal
                 //    coeff_count, bsk_mod_array_[i], tmp1_poly_bsk_base.get() + (i * coeff_count));
                 for (int j = 0; j < coeff_count; j++)
                 {
-                    tmp1_poly_bsk_base[j + (i * coeff_count)] = copy_encrypted1_ntt_bsk_base_mod[j + (i * coeff_count)]
-                        + copy_encrypted1_ntt_bsk_base_mod[j + (i * coeff_count) + encrypted_bsk_ptr_increment];
+                    *temp_ptr_1++ = *temp_ptr_2++ + *temp_ptr_3++;
                 }
                 dyadic_product_coeffmod(copy_encrypted1_ntt_bsk_base_mod.get() + (i * coeff_count), 
                     copy_encrypted2_ntt_bsk_base_mod.get() + (i * coeff_count), coeff_count, bsk_mod_array_[i], 
@@ -520,6 +524,9 @@ namespace seal
             Pointer tmp_second_mul_coeff_base(allocate_poly(coeff_count, coeff_mod_count, pool));
 
             // Compute d0 + d1 and c1*d1 in base q
+            temp_ptr_1 = tmp2_poly_coeff_base.get();
+            temp_ptr_2 = copy_encrypted2_ntt_coeff_mod.get();
+            temp_ptr_3 = temp_ptr_2 + encrypted_ptr_increment;
             for (int i = 0; i < coeff_mod_count; i++)
             {
                 //add_poly_poly_coeffmod(copy_encrypted2_ntt_coeff_mod.get() + (i * coeff_count), 
@@ -527,8 +534,7 @@ namespace seal
                 //    coeff_count, coeff_modulus_[i], tmp2_poly_coeff_base.get() + (i * coeff_count));
                 for (int j = 0; j < coeff_count; j++)
                 {
-                    tmp2_poly_coeff_base[j + (i * coeff_count)] = copy_encrypted2_ntt_coeff_mod[j + (i * coeff_count)]
-                        + copy_encrypted2_ntt_coeff_mod[j + (i * coeff_count) + encrypted_ptr_increment];
+                    *temp_ptr_1++ = *temp_ptr_2++ + *temp_ptr_3++;
                 }
                 dyadic_product_coeffmod(copy_encrypted1_ntt_coeff_mod.get() + (i * coeff_count) + encrypted_ptr_increment, 
                     copy_encrypted2_ntt_coeff_mod.get() + (i * coeff_count) + encrypted_ptr_increment, 
@@ -538,6 +544,9 @@ namespace seal
             Pointer tmp_second_mul_bsk_base(allocate_poly(coeff_count, bsk_base_mod_count_, pool));
 
             // Compute d0 + d1 and c1*d1 in base bsk
+            temp_ptr_1 = tmp2_poly_bsk_base.get();
+            temp_ptr_2 = copy_encrypted2_ntt_bsk_base_mod.get();
+            temp_ptr_3 = temp_ptr_2 + encrypted_bsk_ptr_increment;
             for (int i = 0; i < bsk_base_mod_count_; i++)
             {
                 //add_poly_poly_coeffmod(copy_encrypted2_ntt_bsk_base_mod.get() + (i * coeff_count), 
@@ -545,8 +554,7 @@ namespace seal
                 //    coeff_count, bsk_mod_array_[i], tmp2_poly_bsk_base.get() + (i * coeff_count));
                 for (int j = 0; j < coeff_count; j++)
                 {
-                    tmp2_poly_bsk_base[j + (i * coeff_count)] = copy_encrypted2_ntt_bsk_base_mod[j + (i * coeff_count)]
-                        + copy_encrypted2_ntt_bsk_base_mod[j + (i * coeff_count) + encrypted_bsk_ptr_increment];
+                    *temp_ptr_1++ = *temp_ptr_2++ + *temp_ptr_3++;
                 }
                 dyadic_product_coeffmod(copy_encrypted1_ntt_bsk_base_mod.get() + (i * coeff_count) + encrypted_bsk_ptr_increment, 
                     copy_encrypted2_ntt_bsk_base_mod.get() + (i * coeff_count) + encrypted_bsk_ptr_increment, 
@@ -1342,20 +1350,22 @@ namespace seal
         // Generic plain case
         Pointer adjusted_poly(allocate_zero_uint(coeff_count * coeff_mod_count, pool));
         Pointer decomposed_poly(allocate_uint(coeff_count * coeff_mod_count, pool));
-        uint64_t *poly_to_transform = adjusted_poly.get();
+        uint64_t *poly_to_transform = nullptr;
         if (!qualifiers_.enable_fast_plain_lift)
         {
             // Reposition coefficients.
-            for (int i = 0; i < plain_coeff_count; i++)
+            const uint64_t *plain_ptr = plain.pointer();
+            uint64_t *adjusted_poly_ptr = adjusted_poly.get();
+            for (int i = 0; i < plain_coeff_count; i++, plain_ptr++, adjusted_poly_ptr += coeff_mod_count)
             {
-                if (plain[i] >= plain_upper_half_threshold_)
+                if (*plain_ptr >= plain_upper_half_threshold_)
                 {
-                    add_uint_uint64(plain_upper_half_increment_.get(), plain[i], coeff_mod_count, 
-                        adjusted_poly.get() + (i * coeff_mod_count));
+                    add_uint_uint64(plain_upper_half_increment_.get(), *plain_ptr, coeff_mod_count,
+                        adjusted_poly_ptr);
                 }
                 else
                 {
-                    set_uint(plain[i], coeff_mod_count, adjusted_poly.get() + (i * coeff_mod_count));
+                    set_uint(*plain_ptr, coeff_mod_count, adjusted_poly_ptr);
                 }
             }
             decompose(adjusted_poly.get(), decomposed_poly.get(), pool);
@@ -1363,26 +1373,26 @@ namespace seal
         }
         else
         {
-            for (int i = 0; i < plain_coeff_count; i++)
+            for (int j = 0; j < coeff_mod_count; j++)
             {
-                // Need to lift the coefficient in each qi
-                if (plain[i] >= plain_upper_half_threshold_)
+                const uint64_t *plain_ptr = plain.pointer();
+                uint64_t *adjusted_poly_ptr = adjusted_poly.get() + (j * coeff_count);
+                uint64_t plain_upper_half_increment = plain_upper_half_increment_array_[j];
+                for (int i = 0; i < plain_coeff_count; i++, plain_ptr++, adjusted_poly_ptr++)
                 {
-                    for (int j = 0; j < coeff_mod_count; j++)
+                    // Need to lift the coefficient in each qi
+                    if (*plain_ptr >= plain_upper_half_threshold_)
                     {
-                        adjusted_poly[i + (j * coeff_count)] = plain[i] + plain_upper_half_increment_array_[j];
+                        *adjusted_poly_ptr = *plain_ptr + plain_upper_half_increment;
+                    }
+                    // No need for lifting
+                    else
+                    {
+                        *adjusted_poly_ptr = *plain_ptr;
                     }
                 }
-                // No need for lifting
-                else
-                {
-                    for (int j = 0; j < coeff_mod_count; j++)
-                    {
-                        adjusted_poly[i + (j * coeff_count)] = plain[i];
-                    }
-                }
-                poly_to_transform = adjusted_poly.get();
             }
+            poly_to_transform = adjusted_poly.get();
         }
 
         // Need to multiply each component in encrypted with decomposed_poly (plain poly)
@@ -1394,10 +1404,20 @@ namespace seal
 
         for (int i = 0; i < encrypted_size; i++)
         {
-            for (int j = 0; j < coeff_mod_count; j++)
+            uint64_t *encrypted_ptr = encrypted.mutable_pointer(i);
+            for (int j = 0; j < coeff_mod_count; j++, encrypted_ptr += coeff_count)
             {
-                ntt_multiply_poly_nttpoly(encrypted.pointer(i) + (j * coeff_count), poly_to_transform + (j * coeff_count),
-                    coeff_small_ntt_tables_[j], encrypted.mutable_pointer(i) + (j * coeff_count), pool);
+                // Explicit inline to avoid unnecessary copy
+                //ntt_multiply_poly_nttpoly(encrypted.pointer(i) + (j * coeff_count), poly_to_transform + (j * coeff_count),
+                //    coeff_small_ntt_tables_[j], encrypted.mutable_pointer(i) + (j * coeff_count), pool);
+
+                int coeff_count = coeff_small_ntt_tables_[j].coeff_count() + 1;
+
+                // Lazy reduction
+                ntt_negacyclic_harvey_lazy(encrypted_ptr, coeff_small_ntt_tables_[j]);
+                dyadic_product_coeffmod(encrypted_ptr, poly_to_transform + (j * coeff_count),
+                    coeff_count, coeff_small_ntt_tables_[j].modulus(), encrypted_ptr);
+                inverse_ntt_negacyclic_harvey(encrypted_ptr, coeff_small_ntt_tables_[j]);
             }
         }
     }
@@ -1451,23 +1471,22 @@ namespace seal
         // No need for composed plain lift and decomposition
         else
         {
-            for (int i = 0; i < plain_coeff_count; i++)
+            for (int j = coeff_mod_count - 1; j >= 0; j--)
             {
-                // Need to lift the coefficient in each qi
-                if (plain[i] >= plain_upper_half_threshold_)
+                const uint64_t *plain_ptr = plain.pointer();
+                uint64_t *adjusted_poly_ptr = plain.pointer() + (j * coeff_count);
+                uint64_t plain_upper_half_increment = plain_upper_half_increment_array_[j];
+                for (int i = 0; i < plain_coeff_count; i++, plain_ptr++, adjusted_poly_ptr++)
                 {
-                    // Loop from top to bottom so that plain[i] is not changed until at the end
-                    for (int j = coeff_mod_count - 1; j >= 0; j--)
+                    // Need to lift the coefficient in each qi
+                    if (*plain_ptr >= plain_upper_half_threshold_)
                     {
-                        plain[i + (j * coeff_count)] = plain[i] + plain_upper_half_increment_array_[j];
+                        *adjusted_poly_ptr = *plain_ptr + plain_upper_half_increment;
                     }
-                }
-                // No need for lifting
-                else
-                {
-                    for (int j = 0; j < coeff_mod_count; j++)
+                    // No need for lifting
+                    else
                     {
-                        plain[i + (j * coeff_count)] = plain[i];
+                        *adjusted_poly_ptr = *plain_ptr;
                     }
                 }
             }
