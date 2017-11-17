@@ -437,6 +437,7 @@ namespace seal
         uint64_t new_plain_modulus;
         if (largest_bit_count >= SEAL_USER_MODULO_BIT_BOUND)
         {
+            cout << largest_bit_count << endl;
             // The plain_modulus needed is too big
             return false;
         }
@@ -447,6 +448,8 @@ namespace seal
         map<int, vector<SmallModulus> >::const_iterator iter = coeff_modulus_options.begin();
         while (iter != coeff_modulus_options.end() && !found_good_parms)
         {
+            cout << "n = " << iter->first << endl;
+
             int dimension = iter->first;
             if (dimension < 512 || (dimension & (dimension - 1)) != 0)
             {
