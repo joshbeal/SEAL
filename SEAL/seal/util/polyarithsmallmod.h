@@ -188,9 +188,6 @@ namespace seal
                 throw std::invalid_argument("modulus");
             }
 #endif
-#ifdef SEAL_VECTORIZATION_HINTS
-            multiply_uint_scalar_mod_vector(poly, coeff_count, scalar, modulus, result);
-#else
             // Explicit inline
             //for (int i = 0; i < coeff_count; i++)
             //{
@@ -227,7 +224,6 @@ namespace seal
                 // Claim: One more subtraction is enough
                 *result++ = tmp3 - (modulus_value & static_cast<uint64_t>(-static_cast<std::int64_t>(tmp3 >= modulus_value)));
             }
-#endif
         }
 
         void multiply_poly_poly_coeffmod(const std::uint64_t *operand1, int operand1_coeff_count,
@@ -409,9 +405,6 @@ namespace seal
                 throw std::invalid_argument("modulus");
             }
 #endif
-#ifdef SEAL_VECTORIZATION_HINTS
-            multiply_uint_uint_mod_vector(operand1, operand2, coeff_count, modulus, result);
-#else
             // Explicit inline
             //for (int i = 0; i < coeff_count; i++)
             //{
@@ -448,7 +441,6 @@ namespace seal
                 // Claim: One more subtraction is enough
                 *result++ = tmp3 - (modulus_value & static_cast<uint64_t>(-static_cast<std::int64_t>(tmp3 >= modulus_value)));
             }
-#endif
         }
 
         void modulo_poly_inplace(std::uint64_t *value, int value_coeff_count, const PolyModulus &poly_modulus,

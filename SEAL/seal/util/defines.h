@@ -18,9 +18,6 @@
 // elsewhere.
 #define SEAL_THROW_ON_MULTIPLY_PLAIN_BY_ZERO
 
-// Use unrolled versions of polynomial operations for automatic vectorization
-#undef SEAL_VECTORIZATION_HINTS
-
 // Compile for big-endian system (not implemented)
 #undef SEAL_BIG_ENDIAN
 
