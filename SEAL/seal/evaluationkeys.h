@@ -185,7 +185,7 @@ namespace seal
             return hash_block_;
         }
 
-		// C++11 compatibility
+        // C++11 compatibility
         EncryptionParameters::hash_block_type hash_block_{ { 0 } };
 
         /**

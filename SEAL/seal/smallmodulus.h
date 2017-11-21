@@ -197,7 +197,7 @@ namespace seal
 
         std::uint64_t value_ = 0;
 
-		// C++11 compatibility
+        // C++11 compatibility
         std::array<std::uint64_t, 3> const_ratio_{ { 0 } };
 
         int bit_count_ = 0;
