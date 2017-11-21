@@ -5,7 +5,7 @@ INCLUDE_DIR=../SEAL
 SRCS=main.cpp
 SEALRUN=$(BIN_DIR)/sealexamples
 CXX=g++
-CXXFLAGS=-march=native -O3 -std=c++11 -pthread
+CXXFLAGS=-march=native -O3 -DHAVE_CONFIG_H -std=c++11 -pthread
 LDFLAGS=
 
 .PHONY : all clean
