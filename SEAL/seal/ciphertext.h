@@ -346,7 +346,8 @@ namespace seal
         */
         inline void release()
         {
-            hash_block_ = { 0 };
+			// C++11 compatibility
+            hash_block_ = { { 0 } };
             size_capacity_ = 2;
             size_ = 2;
             poly_coeff_count_ = 0;
@@ -605,7 +606,8 @@ namespace seal
 
         MemoryPoolHandle pool_;
 
-        EncryptionParameters::hash_block_type hash_block_{ 0 };
+		// C++11 compatibility
+        EncryptionParameters::hash_block_type hash_block_{ { 0 } };
         
         int size_capacity_ = 2;
 

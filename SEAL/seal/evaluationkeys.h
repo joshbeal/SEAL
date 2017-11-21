@@ -185,7 +185,8 @@ namespace seal
             return hash_block_;
         }
 
-        EncryptionParameters::hash_block_type hash_block_{ 0 };
+		// C++11 compatibility
+        EncryptionParameters::hash_block_type hash_block_{ { 0 } };
 
         /**
         The vector of evaluation keys.

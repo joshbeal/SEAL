@@ -90,11 +90,11 @@
 
 
 // GNU GCC/G++
-#if defined(__GNUC__) && (__GNUC__ < 6)
-#error "SEAL requires __GNUC__ >= 6" 
+#if defined(__GNUC__) && (__GNUC__ < 5)
+#error "SEAL requires __GNUC__ >= 5" 
 #endif
 
-#if (__GNUC__ >= 6) && defined(__cplusplus)
+#if (__GNUC__ >= 5) && defined(__cplusplus)
 
 // Read in config.h to disable unavailable intrinsics
 #ifdef HAVE_CONFIG_H
@@ -154,7 +154,7 @@
 #endif //SEAL_ENABLE__SUBBORROW_U64
 
 #endif //SEAL_ENABLE_INTRIN
-#endif //defined(__GNUC__ >= 6) && defined(__cplusplus)
+#endif //defined(__GNUC__ >= 5) && defined(__cplusplus)
 
 // Use generic functions as (slower) fallback
 #ifndef SEAL_ADD_CARRY_UINT64
