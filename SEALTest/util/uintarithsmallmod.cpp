@@ -307,26 +307,25 @@ namespace SEALTest
 
             TEST_METHOD(TryPrimitiveRootSmallMod)
             {
-                MemoryPool &pool = *global_variables::global_memory_pool;
                 uint64_t result;
                 SmallModulus mod(11);
 
-                Assert::IsTrue(try_primitive_root(2, mod, result, pool));
+                Assert::IsTrue(try_primitive_root(2, mod, result));
                 Assert::AreEqual(10ULL, result);
 
                 mod = 29;
-                Assert::IsTrue(try_primitive_root(2, mod, result, pool));
+                Assert::IsTrue(try_primitive_root(2, mod, result));
                 Assert::AreEqual(28ULL, result);
 
                 vector<uint64_t> corrects{ 12, 17 };
-                Assert::IsTrue(try_primitive_root(4, mod, result, pool));
+                Assert::IsTrue(try_primitive_root(4, mod, result));
                 Assert::IsTrue(std::find(corrects.begin(), corrects.end(), result) != corrects.end());
 
                 mod = 1234565441;
-                Assert::IsTrue(try_primitive_root(2, mod, result, pool));
+                Assert::IsTrue(try_primitive_root(2, mod, result));
                 Assert::AreEqual(1234565440ULL, result);
                 corrects = { 984839708, 273658408, 249725733, 960907033 };
-                Assert::IsTrue(try_primitive_root(8, mod, result, pool));
+                Assert::IsTrue(try_primitive_root(8, mod, result));
                 Assert::IsTrue(std::find(corrects.begin(), corrects.end(), result) != corrects.end());
             }
 
@@ -356,23 +355,22 @@ namespace SEALTest
 
             TEST_METHOD(TryMinimalPrimitiveRootSmallMod)
             {
-                MemoryPool &pool = *global_variables::global_memory_pool;
                 SmallModulus mod(11);
 
                 uint64_t result;
-                Assert::IsTrue(try_minimal_primitive_root(2, mod, result, pool));
+                Assert::IsTrue(try_minimal_primitive_root(2, mod, result));
                 Assert::AreEqual(10ULL, result);
 
                 mod = 29;
-                Assert::IsTrue(try_minimal_primitive_root(2, mod, result, pool));
+                Assert::IsTrue(try_minimal_primitive_root(2, mod, result));
                 Assert::AreEqual(28ULL, result);
-                Assert::IsTrue(try_minimal_primitive_root(4, mod, result, pool));
+                Assert::IsTrue(try_minimal_primitive_root(4, mod, result));
                 Assert::AreEqual(12ULL, result);
 
                 mod = 1234565441;
-                Assert::IsTrue(try_minimal_primitive_root(2, mod, result, pool));
+                Assert::IsTrue(try_minimal_primitive_root(2, mod, result));
                 Assert::AreEqual(1234565440ULL, result);
-                Assert::IsTrue(try_minimal_primitive_root(8, mod, result, pool));
+                Assert::IsTrue(try_minimal_primitive_root(8, mod, result));
                 Assert::AreEqual(249725733ULL, result);
             }
 

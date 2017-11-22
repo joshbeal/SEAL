@@ -508,6 +508,29 @@ namespace SEALTest
                 Assert::IsTrue(encrypted2.hash_block() == encrypted1.hash_block());
                 Assert::IsTrue(encrypted1.hash_block() == parms.hash_block());
             }
+            {
+                EncryptionParameters parms;
+                SmallModulus plain_modulus(1 << 6);
+                parms.set_poly_modulus("1x^128 + 1");
+                parms.set_plain_modulus(plain_modulus);
+                parms.set_coeff_modulus({ small_mods_40bit(0), small_mods_40bit(1) });
+                SEALContext context(parms);
+                KeyGenerator keygen(context);
+
+                BalancedEncoder encoder(plain_modulus);
+                Encryptor encryptor(context, keygen.public_key());
+                Evaluator evaluator(context);
+                Decryptor decryptor(context, keygen.secret_key());
+
+                Ciphertext encrypted1;
+                Plaintext plain;
+                encryptor.encrypt(encoder.encode(123), encrypted1);
+                evaluator.multiply(encrypted1, encrypted1, encrypted1);
+                evaluator.multiply(encrypted1, encrypted1, encrypted1);
+                decryptor.decrypt(encrypted1, plain);
+                Assert::AreEqual(static_cast<uint64_t>(228886641), encoder.decode_uint64(plain));
+                Assert::IsTrue(encrypted1.hash_block() == parms.hash_block());
+            }
         }
 
         TEST_METHOD(FVEncryptSquareDecrypt)
@@ -561,6 +584,13 @@ namespace SEALTest
             evaluator.square(encrypted);
             decryptor.decrypt(encrypted, plain);
             Assert::AreEqual(0x100000000ULL, encoder.decode_uint64(plain));
+            Assert::IsTrue(encrypted.hash_block() == parms.hash_block());
+
+            encryptor.encrypt(encoder.encode(123), encrypted);
+            evaluator.square(encrypted);
+            evaluator.square(encrypted);
+            decryptor.decrypt(encrypted, plain);
+            Assert::AreEqual(228886641ULL, encoder.decode_uint64(plain));
             Assert::IsTrue(encrypted.hash_block() == parms.hash_block());
         }
 
