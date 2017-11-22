@@ -22,21 +22,25 @@ namespace SEALNETTest
                 var keygen = new KeyGenerator(context);
 
                 var keys = new EvaluationKeys();
+                Assert.AreEqual(keys.DecompositionBitCount, 0);
                 var test_keys = new EvaluationKeys();
                 keys.Save(stream);
                 stream.Seek(0, SeekOrigin.Begin);
                 test_keys.Load(stream);
                 Assert.AreEqual(keys.Size, test_keys.Size);
                 Assert.IsTrue(keys.HashBlock.Equals(test_keys.HashBlock));
+                Assert.AreEqual(keys.DecompositionBitCount, test_keys.DecompositionBitCount);
                 Assert.AreEqual(0, keys.Size);
 
                 keygen.GenerateEvaluationKeys(1, 1, keys);
+                Assert.AreEqual(keys.DecompositionBitCount, 1);
                 stream.Seek(0, SeekOrigin.Begin);
                 keys.Save(stream);
                 stream.Seek(0, SeekOrigin.Begin);
                 test_keys.Load(stream);
                 Assert.AreEqual(keys.Size, test_keys.Size);
                 Assert.IsTrue(keys.HashBlock.Equals(test_keys.HashBlock));
+                Assert.AreEqual(keys.DecompositionBitCount, test_keys.DecompositionBitCount);
                 for (int j = 0; j < test_keys.Size; j++)
                 {
                     for (int i = 0; i < test_keys.Key(j + 2).Count; i++)
@@ -47,12 +51,14 @@ namespace SEALNETTest
                 }
 
                 keygen.GenerateEvaluationKeys(2, 1, keys);
+                Assert.AreEqual(keys.DecompositionBitCount, 2);
                 stream.Seek(0, SeekOrigin.Begin);
                 keys.Save(stream);
                 stream.Seek(0, SeekOrigin.Begin);
                 test_keys.Load(stream);
                 Assert.AreEqual(keys.Size, test_keys.Size);
                 Assert.IsTrue(keys.HashBlock.Equals(test_keys.HashBlock));
+                Assert.AreEqual(keys.DecompositionBitCount, test_keys.DecompositionBitCount);
                 for (int j = 0; j < test_keys.Size; j++)
                 {
                     for (int i = 0; i < test_keys.Key(j + 2).Count; i++)
@@ -63,12 +69,14 @@ namespace SEALNETTest
                 }
 
                 keygen.GenerateEvaluationKeys(59, 2, keys);
+                Assert.AreEqual(keys.DecompositionBitCount, 59);
                 stream.Seek(0, SeekOrigin.Begin);
                 keys.Save(stream);
                 stream.Seek(0, SeekOrigin.Begin);
                 test_keys.Load(stream);
                 Assert.AreEqual(keys.Size, test_keys.Size);
                 Assert.IsTrue(keys.HashBlock.Equals(test_keys.HashBlock));
+                Assert.AreEqual(keys.DecompositionBitCount, test_keys.DecompositionBitCount);
                 for (int j = 0; j < test_keys.Size; j++)
                 {
                     for (int i = 0; i < test_keys.Key(j + 2).Count; i++)
@@ -79,12 +87,14 @@ namespace SEALNETTest
                 }
 
                 keygen.GenerateEvaluationKeys(60, 5, keys);
+                Assert.AreEqual(keys.DecompositionBitCount, 60);
                 stream.Seek(0, SeekOrigin.Begin);
                 keys.Save(stream);
                 stream.Seek(0, SeekOrigin.Begin);
                 test_keys.Load(stream);
                 Assert.AreEqual(keys.Size, test_keys.Size);
                 Assert.IsTrue(keys.HashBlock.Equals(test_keys.HashBlock));
+                Assert.AreEqual(keys.DecompositionBitCount, test_keys.DecompositionBitCount);
                 for (int j = 0; j < test_keys.Size; j++)
                 {
                     for (int i = 0; i < test_keys.Key(j + 2).Count; i++)
@@ -105,6 +115,7 @@ namespace SEALNETTest
                 var keygen = new KeyGenerator(context);
 
                 var keys = new EvaluationKeys();
+                Assert.AreEqual(keys.DecompositionBitCount, 0);
                 var test_keys = new EvaluationKeys();
                 stream.Seek(0, SeekOrigin.Begin);
                 keys.Save(stream);
@@ -112,15 +123,18 @@ namespace SEALNETTest
                 test_keys.Load(stream);
                 Assert.AreEqual(keys.Size, test_keys.Size);
                 Assert.IsTrue(keys.HashBlock.Equals(test_keys.HashBlock));
+                Assert.AreEqual(keys.DecompositionBitCount, test_keys.DecompositionBitCount);
                 Assert.AreEqual(0, keys.Size);
 
                 keygen.GenerateEvaluationKeys(8, 1, keys);
+                Assert.AreEqual(keys.DecompositionBitCount, 8);
                 stream.Seek(0, SeekOrigin.Begin);
                 keys.Save(stream);
                 stream.Seek(0, SeekOrigin.Begin);
                 test_keys.Load(stream);
                 Assert.AreEqual(keys.Size, test_keys.Size);
                 Assert.IsTrue(keys.HashBlock.Equals(test_keys.HashBlock));
+                Assert.AreEqual(keys.DecompositionBitCount, test_keys.DecompositionBitCount);
                 for (int j = 0; j < test_keys.Size; j++)
                 {
                     for (int i = 0; i < test_keys.Key(j + 2).Count; i++)
@@ -131,12 +145,14 @@ namespace SEALNETTest
                 }
 
                 keygen.GenerateEvaluationKeys(8, 2, keys);
+                Assert.AreEqual(keys.DecompositionBitCount, 8);
                 stream.Seek(0, SeekOrigin.Begin);
                 keys.Save(stream);
                 stream.Seek(0, SeekOrigin.Begin);
                 test_keys.Load(stream);
                 Assert.AreEqual(keys.Size, test_keys.Size);
                 Assert.IsTrue(keys.HashBlock.Equals(test_keys.HashBlock));
+                Assert.AreEqual(keys.DecompositionBitCount, test_keys.DecompositionBitCount);
                 for (int j = 0; j < test_keys.Size; j++)
                 {
                     for (int i = 0; i < test_keys.Key(j + 2).Count; i++)
@@ -147,12 +163,14 @@ namespace SEALNETTest
                 }
 
                 keygen.GenerateEvaluationKeys(59, 2, keys);
+                Assert.AreEqual(keys.DecompositionBitCount, 59);
                 stream.Seek(0, SeekOrigin.Begin);
                 keys.Save(stream);
                 stream.Seek(0, SeekOrigin.Begin);
                 test_keys.Load(stream);
                 Assert.AreEqual(keys.Size, test_keys.Size);
                 Assert.IsTrue(keys.HashBlock.Equals(test_keys.HashBlock));
+                Assert.AreEqual(keys.DecompositionBitCount, test_keys.DecompositionBitCount);
                 for (int j = 0; j < test_keys.Size; j++)
                 {
                     for (int i = 0; i < test_keys.Key(j + 2).Count; i++)
@@ -163,12 +181,14 @@ namespace SEALNETTest
                 }
 
                 keygen.GenerateEvaluationKeys(60, 5, keys);
+                Assert.AreEqual(keys.DecompositionBitCount, 60);
                 stream.Seek(0, SeekOrigin.Begin);
                 keys.Save(stream);
                 stream.Seek(0, SeekOrigin.Begin);
                 test_keys.Load(stream);
                 Assert.AreEqual(keys.Size, test_keys.Size);
                 Assert.IsTrue(keys.HashBlock.Equals(test_keys.HashBlock));
+                Assert.AreEqual(keys.DecompositionBitCount, test_keys.DecompositionBitCount);
                 for (int j = 0; j < test_keys.Size; j++)
                 {
                     for (int i = 0; i < test_keys.Key(j + 2).Count; i++)
