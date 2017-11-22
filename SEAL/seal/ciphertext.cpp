@@ -192,7 +192,6 @@ namespace seal
         // to resize to bigger size
         Pointer new_allocation(allocate_uint(new_uint64_count, pool));
         set_uint_uint(ciphertext_array_.get(), old_uint64_count, new_allocation.get());
-        set_zero_uint(new_uint64_count - old_uint64_count, new_allocation.get() + old_uint64_count);
         ciphertext_array_.acquire(new_allocation);
 
         // Set the size parameters

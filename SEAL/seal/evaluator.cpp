@@ -633,7 +633,7 @@ namespace seal
                         {
                             dyadic_product_coeffmod(copy_encrypted1_ntt_coeff_mod.get() + (i * coeff_count) + (encrypted_ptr_increment * encrypted1_index), 
                                 copy_encrypted2_ntt_coeff_mod.get() + (i * coeff_count) + (encrypted_ptr_increment * encrypted2_index), 
-                                coeff_small_ntt_tables_[i].coeff_count(), coeff_modulus_[i], tmp1_poly_coeff_base.get() + (i * coeff_count));
+                                coeff_count, coeff_modulus_[i], tmp1_poly_coeff_base.get() + (i * coeff_count));
                             add_poly_poly_coeffmod(tmp1_poly_coeff_base.get() + (i * coeff_count), 
                                 tmp_des_coeff_base.get() + (i * coeff_count) + (secret_power_index * coeff_count * coeff_mod_count), coeff_count, 
                                 coeff_modulus_[i], tmp_des_coeff_base.get() + (i * coeff_count) + (secret_power_index * coeff_count * coeff_mod_count));
@@ -644,7 +644,7 @@ namespace seal
                         {
                             dyadic_product_coeffmod(copy_encrypted1_ntt_bsk_base_mod.get() + (i * coeff_count) + (encrypted_bsk_ptr_increment * encrypted1_index), 
                                 copy_encrypted2_ntt_bsk_base_mod.get() + (i * coeff_count) + (encrypted_bsk_ptr_increment * encrypted2_index), 
-                                bsk_small_ntt_tables_[i].coeff_count(), bsk_mod_array_[i], tmp1_poly_bsk_base.get() + (i * coeff_count));
+                                coeff_count, bsk_mod_array_[i], tmp1_poly_bsk_base.get() + (i * coeff_count));
                             add_poly_poly_coeffmod(tmp1_poly_bsk_base.get() + (i * coeff_count), 
                                 tmp_des_bsk_base.get() + (i * coeff_count) + (secret_power_index * coeff_count * bsk_base_mod_count_), 
                                 coeff_count, bsk_mod_array_[i], 
