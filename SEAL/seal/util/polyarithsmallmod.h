@@ -34,7 +34,7 @@ namespace seal
             }
 #endif
             const std::uint64_t modulus_value = modulus.value();
-            for (std::uint64_t i = 0; i < coeff_count; i++)
+            for (int i = 0; i < coeff_count; i++)
             {
                 *result++ = *poly++ % modulus_value;
             }
@@ -315,7 +315,7 @@ namespace seal
                 throw std::invalid_argument("coeff_count_power");
             }
             // Verify coprime conditions.
-            if (!(galois_elt & 1) || galois_elt >= (1ULL << (coeff_count_power + 1)) || (galois_elt < 0))
+            if (!(galois_elt & 1) || galois_elt >= (1ULL << (coeff_count_power + 1)))
             {
                 throw std::invalid_argument("galois element is not valid");
             }
@@ -363,7 +363,7 @@ namespace seal
                 throw std::invalid_argument("coeff_count_power");
             }
             // Verify coprime conditions.
-            if (!(galois_elt & 1) || galois_elt >= (1ULL << (coeff_count_power + 1)) || (galois_elt < 0))
+            if (!(galois_elt & 1) || galois_elt >= (1ULL << (coeff_count_power + 1)))
             {
                 throw std::invalid_argument("galois element is not valid");
             }

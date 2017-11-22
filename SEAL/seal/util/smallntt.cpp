@@ -56,7 +56,7 @@ namespace seal
             modulus_ = modulus;
 
             // We defer parameter checking to try_minimal_primitive_root(...)
-            if (!try_minimal_primitive_root(2 * coeff_count_, modulus_, root_, pool_))
+            if (!try_minimal_primitive_root(2 * coeff_count_, modulus_, root_))
             {
                 reset();
                 return false;

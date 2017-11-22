@@ -1213,7 +1213,7 @@ namespace seal
         // It is needed for slot permutations. 
         // Input: encryption of M(x) and an integer p such that gcd(p, m) = 1.
         // Output: encryption of M(x^p). 
-        // The function requires certain GaloisKeys and auxilliary data. 
+        // The function requires certain GaloisKeys and auxiliary data. 
         void apply_galois(Ciphertext &encrypted, std::uint64_t galois_elt, const GaloisKeys &evaluation_keys,
             const MemoryPoolHandle &pool);
 

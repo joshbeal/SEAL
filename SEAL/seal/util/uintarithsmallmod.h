@@ -242,10 +242,10 @@ namespace seal
         bool is_primitive_root(std::uint64_t root, std::uint64_t degree, const SmallModulus &prime_modulus);
 
         // Try to find a primitive degree-th root of unity modulo small prime modulus, where degree must be a power of two.
-        bool try_primitive_root(std::uint64_t degree, const SmallModulus &prime_modulus, std::uint64_t &destination, MemoryPool &pool);
+        bool try_primitive_root(std::uint64_t degree, const SmallModulus &prime_modulus, std::uint64_t &destination);
 
         // Try to find the smallest (as integer) primitive degree-th root of unity modulo small prime modulus, where degree must be a power of two.
-        bool try_minimal_primitive_root(std::uint64_t degree, const SmallModulus &prime_modulus, std::uint64_t &destination, MemoryPool &pool);
+        bool try_minimal_primitive_root(std::uint64_t degree, const SmallModulus &prime_modulus, std::uint64_t &destination);
    
         std::uint64_t exponentiate_uint_mod(std::uint64_t operand, std::uint64_t exponent, const SmallModulus &modulus);
     }

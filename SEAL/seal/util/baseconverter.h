@@ -14,7 +14,8 @@ namespace seal
         class BaseConverter
         {
         public:
-            BaseConverter(const MemoryPoolHandle &pool = MemoryPoolHandle::Global()) : pool_(pool)
+            BaseConverter(const MemoryPoolHandle &pool = MemoryPoolHandle::Global()) : 
+                pool_(pool)
             {
             }
 
@@ -27,7 +28,7 @@ namespace seal
             BaseConverter(const std::vector<SmallModulus> &coeff_base, int coeff_count, int coeff_power, 
                 const SmallModulus &small_plain_mod, const MemoryPoolHandle &pool = MemoryPoolHandle::Global());
 
-            BaseConverter(const BaseConverter &copy);
+            BaseConverter(const BaseConverter &copy) = default;
 
             BaseConverter(BaseConverter &&source) = default;
 
@@ -123,6 +124,18 @@ namespace seal
         private:
             MemoryPoolHandle pool_;
             
+            bool generated_ = false;
+            
+            int coeff_base_mod_count_ = 0;
+
+            int aux_base_mod_count_ = 0;
+
+            int bsk_base_mod_count_ = 0;
+
+            int coeff_count_ = 0;
+
+            int plain_gamma_count_ = 0;
+
             // Array of coefficient small moduli
             std::vector<SmallModulus> coeff_base_array_;
 
@@ -159,9 +172,15 @@ namespace seal
             // Array of auxiliary bases products mod m_sk_
             std::vector<std::uint64_t> aux_base_products_mod_msk_array_;
 
+            // Coeff moduli products inverse mod m_tilde 
+            std::uint64_t inv_coeff_products_mod_mtilde_ = 0;
+
             // Auxiliary base products mod m_sk_  (m1*m2*...*ml)-1 mod m_sk
             std::uint64_t inv_aux_products_mod_msk_ = 0;
-
+            
+            // Gamma inverse mod plain modulus
+            std::uint64_t inv_gamma_mod_plain_ = 0;
+          
             // Auxiliary base products mod coeff moduli (m1*m2*...*ml) mod qi
             std::vector<std::uint64_t> aux_products_all_mod_coeff_array_;
 
@@ -182,7 +201,7 @@ namespace seal
             
             // Array of small NTT tables for moduli in Bsk
             std::vector<SmallNTTTables> bsk_small_ntt_table_;
-            
+
             SmallModulus m_tilde_;
 
             SmallModulus m_sk_;
@@ -190,24 +209,6 @@ namespace seal
             SmallModulus small_plain_mod_;
 
             SmallModulus gamma_;
-
-            // Coeff moduli products inverse mod m_tilde 
-            std::uint64_t inv_coeff_products_mod_mtilde_ = 0;
-
-            // Gamma inverse mod plain modulus
-            std::uint64_t inv_gamma_mod_plain_ = 0;
-
-            bool generated_ = false;
-            
-            int coeff_base_mod_count_ = 0;
-
-            int aux_base_mod_count_ = 0;
-
-            int bsk_base_mod_count_ = 0;
-
-            int coeff_count_ = 0;
-
-            int plain_gamma_count_ = 0;
         };
     }
 }

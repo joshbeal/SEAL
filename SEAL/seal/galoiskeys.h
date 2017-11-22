@@ -125,11 +125,12 @@ namespace seal
         Returns whether a Galois key corresponding to a given Galois element exists.
 
         @param[in] galois_elt The Galois element
+        @throw std::invalid_argument if Galois element is not valid
         */
         inline bool has_key(std::uint64_t galois_elt) const
         {
             // Verify parameters
-            if (!(galois_elt & 1) || (galois_elt < 0))
+            if (!(galois_elt & 1))
             {
                 throw std::invalid_argument("galois element is not valid");
             }

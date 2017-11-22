@@ -18,8 +18,8 @@ namespace seal
 {
     KeyGenerator::KeyGenerator(const SEALContext &context, const MemoryPoolHandle &pool) :
         pool_(pool), parms_(context.parms()),
-        random_generator_(parms_.random_generator()),
-        qualifiers_(context.qualifiers())
+        qualifiers_(context.qualifiers()),
+        random_generator_(parms_.random_generator())
     {
         // Verify parameters
         if (!qualifiers_.parameters_set)
@@ -198,7 +198,6 @@ namespace seal
         // Extract encryption parameters.
         int coeff_count = parms_.poly_modulus().coeff_count();
         int coeff_mod_count = parms_.coeff_modulus().size();
-        int coeff_bit_count = bits_per_uint64 * coeff_mod_count;
 
         // Initialize decomposition_factors
         vector<vector<uint64_t> > decomposition_factors;
@@ -311,7 +310,6 @@ namespace seal
         // Extract encryption parameters.
         int coeff_count = parms_.poly_modulus().coeff_count();
         int coeff_mod_count = parms_.coeff_modulus().size();
-        int coeff_bit_count = bits_per_uint64 * coeff_mod_count;
 
         // The max number of keys is equal to number of coefficients
         galois_keys.mutable_data().resize(coeff_count);
@@ -323,7 +321,7 @@ namespace seal
         for (uint64_t galois_elt : galois_elts)
         {
             // Verify coprime conditions.
-            if (!(galois_elt & 1) || (galois_elt >= 2 * (coeff_count - 1)) || (galois_elt < 0))
+            if (!(galois_elt & 1) || (galois_elt >= 2 * (coeff_count - 1)))
             {
                 throw invalid_argument("galois element is not valid");
             }

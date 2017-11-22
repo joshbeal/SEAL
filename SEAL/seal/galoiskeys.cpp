@@ -14,7 +14,7 @@ namespace seal
 
         // Save the decomposition bit count
         int32_t decomposition_bit_count32 = static_cast<int32_t>(decomposition_bit_count_);
-        stream.write(reinterpret_cast<const char*>(&decomposition_bit_count_), sizeof(int32_t));
+        stream.write(reinterpret_cast<const char*>(&decomposition_bit_count32), sizeof(int32_t));
 
         // Save the size of keys_
         int32_t keys_dim1 = static_cast<int32_t>(keys_.size());

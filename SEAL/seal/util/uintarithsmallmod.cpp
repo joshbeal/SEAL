@@ -36,7 +36,7 @@ namespace seal
             return exponentiate_uint_mod(root, degree >> 1, modulus) == (modulus.value() - 1);
         }
         
-        bool try_primitive_root(uint64_t degree, const SmallModulus &modulus, uint64_t &destination, MemoryPool &pool)
+        bool try_primitive_root(uint64_t degree, const SmallModulus &modulus, uint64_t &destination) 
         {
 #ifdef SEAL_DEBUG
             if (modulus.bit_count() < 2)
@@ -80,10 +80,10 @@ namespace seal
             return is_primitive_root(destination, degree, modulus);
         }
         
-        bool try_minimal_primitive_root(uint64_t degree, const SmallModulus &modulus, uint64_t &destination, MemoryPool &pool)
+        bool try_minimal_primitive_root(uint64_t degree, const SmallModulus &modulus, uint64_t &destination)
         {
             uint64_t root;
-            if (!try_primitive_root(degree, modulus, root, pool))
+            if (!try_primitive_root(degree, modulus, root))
             {
                 return false;
             }

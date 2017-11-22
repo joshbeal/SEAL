@@ -129,11 +129,11 @@ namespace seal
         coeff_small_ntt_tables_(copy.coeff_small_ntt_tables_),
         bsk_small_ntt_tables_(copy.bsk_small_ntt_tables_),
         plain_upper_half_threshold_(copy.plain_upper_half_threshold_),
+        plain_upper_half_increment_array_(copy.plain_upper_half_increment_array_),
         coeff_modulus_(copy.coeff_modulus_),
         bsk_mod_array_(copy.bsk_mod_array_),
         inv_coeff_products_mod_coeff_array_(copy.inv_coeff_products_mod_coeff_array_),
         bsk_base_mod_count_(copy.bsk_base_mod_count_),
-        plain_upper_half_increment_array_(copy.plain_upper_half_increment_array_),
         Zmstar_to_generator_(copy.Zmstar_to_generator_)
     {
         int coeff_count = parms_.poly_modulus().coeff_count();
@@ -890,8 +890,6 @@ namespace seal
     void Evaluator::relinearize(Ciphertext &encrypted, const EvaluationKeys &evaluation_keys, int destination_size, const MemoryPoolHandle &pool)
     {
         // Extract encryption parameters.
-        int coeff_count = parms_.poly_modulus().coeff_count();
-        int coeff_mod_count = coeff_modulus_.size();
         int encrypted_size = encrypted.size();
 
         // Verify parameters.
@@ -1202,7 +1200,6 @@ namespace seal
         // Extract encryption parameters.
         int coeff_count = parms_.poly_modulus().coeff_count();
         int coeff_mod_count = coeff_modulus_.size();
-        int encrypted_size = encrypted.size();
 
         // Verify parameters.
         if (encrypted.hash_block_ != parms_.hash_block())
@@ -1599,7 +1596,7 @@ namespace seal
         int encrypted_size = encrypted.size();
 
         // Verify parameters
-        if (!(galois_elt & 1) || (galois_elt >= 2 * (coeff_count - 1)) || (galois_elt < 0))
+        if (!(galois_elt & 1) || (galois_elt >= 2 * (coeff_count - 1)))
         {
             throw invalid_argument("galois element is not valid");
         }

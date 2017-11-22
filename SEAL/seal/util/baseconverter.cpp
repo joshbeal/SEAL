@@ -17,32 +17,6 @@ namespace seal
 {
     namespace util
     {
-        BaseConverter::BaseConverter(const BaseConverter &copy) : pool_(copy.pool_), generated_(copy.generated_),
-            m_tilde_(copy.m_tilde_), m_sk_(copy.m_sk_), coeff_base_mod_count_(copy.coeff_base_mod_count_), aux_base_mod_count_(copy.aux_base_mod_count_),
-            coeff_base_array_(copy.coeff_base_array_), aux_base_array_(copy.aux_base_array_), inv_aux_products_mod_msk_(copy.inv_aux_products_mod_msk_),
-            bsk_base_mod_count_(copy.bsk_base_mod_count_), inv_coeff_products_mod_mtilde_(copy.inv_coeff_products_mod_mtilde_), coeff_count_(copy.coeff_count_),
-            bsk_base_array_(copy.bsk_base_array_), plain_gamma_array_(copy.plain_gamma_array_), gamma_(copy.gamma_), inv_gamma_mod_plain_(copy.inv_gamma_mod_plain_),
-            plain_gamma_count_(copy.plain_gamma_count_), bsk_small_ntt_table_(copy.bsk_small_ntt_table_)
-        {
-            if (generated_)
-            {
-                mtilde_inv_coeff_base_products_mod_coeff_array_ = copy.mtilde_inv_coeff_base_products_mod_coeff_array_;
-                inv_aux_base_products_mod_aux_array_ = copy.inv_aux_base_products_mod_aux_array_;
-                inv_coeff_base_products_mod_coeff_array_ = copy.inv_coeff_base_products_mod_coeff_array_;
-                coeff_base_products_mod_mtilde_array_ = copy.coeff_base_products_mod_mtilde_array_;
-                inv_coeff_products_all_mod_aux_bsk_array_ = copy.inv_coeff_products_all_mod_aux_bsk_array_;
-                coeff_base_products_mod_aux_bsk_array_ = copy.coeff_base_products_mod_aux_bsk_array_;
-                aux_base_products_mod_coeff_array_ = copy.aux_base_products_mod_coeff_array_;
-                aux_base_products_mod_msk_array_ = copy.aux_base_products_mod_msk_array_;
-                aux_products_all_mod_coeff_array_ = copy.aux_products_all_mod_coeff_array_;
-                coeff_products_all_mod_bsk_array_ = copy.coeff_products_all_mod_bsk_array_;
-                inv_mtilde_mod_bsk_array_ = copy.inv_mtilde_mod_bsk_array_;
-                coeff_products_mod_plain_gamma_array_ = copy.coeff_products_mod_plain_gamma_array_;
-                neg_inv_coeff_products_all_mod_plain_gamma_array_ = copy.neg_inv_coeff_products_all_mod_plain_gamma_array_;
-                plain_gamma_product_mod_coeff_array_ = copy.plain_gamma_product_mod_coeff_array_;
-            }
-        }
-
         BaseConverter::BaseConverter(const std::vector<SmallModulus> &coeff_base, int coeff_count, int coeff_power, 
             const SmallModulus &small_plain_mod, const MemoryPoolHandle &pool) : pool_(pool)
         {

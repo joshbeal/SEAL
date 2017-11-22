@@ -331,7 +331,6 @@ namespace seal
         Pointer temp(allocate_uint(coeff_mod_count, pool_));
         set_zero_uint(total_uint64_count, value);
 
-        uint64_t* value_ptr = value;
         for (int i = 0; i < coeff_count; i++)
         {
             for (int j = 0; j < coeff_mod_count; j++)
