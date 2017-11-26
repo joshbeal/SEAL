@@ -1223,6 +1223,7 @@ namespace seal
         int coeff_mod_count = coeff_modulus_.size();
         int encrypted_size = encrypted.size();
         int plain_coeff_count = plain.coeff_count();
+        int plain_nonzero_coeff_count = plain.nonzero_coeff_count();
 
         // Verify parameters.
         if (encrypted.hash_block_ != parms_.hash_block())
@@ -1309,6 +1310,73 @@ namespace seal
                         {
                             multiply_poly_scalar_coeffmod(encrypted.pointer(i) + (j * coeff_count), coeff_count,
                                 plain[0], coeff_modulus_[j], encrypted.mutable_pointer(i) + (j * coeff_count));
+                        }
+                    }
+                }
+                return;
+            }
+        }
+
+        // Multiplying by a monomial?
+        if (plain_nonzero_coeff_count == 1)
+        {
+            int mono_power = plain_coeff_count - 1;
+
+            if (!qualifiers_.enable_fast_plain_lift)
+            {
+                Pointer adjusted_coeff(allocate_uint(coeff_mod_count, pool));
+                if (plain[mono_power] >= plain_upper_half_threshold_)
+                {
+                    Pointer decomposed_coeff(allocate_uint(coeff_mod_count, pool));
+                    add_uint_uint64(plain_upper_half_increment_.get(), plain[mono_power], coeff_mod_count, adjusted_coeff.get());
+                    decompose_single_coeff(adjusted_coeff.get(), decomposed_coeff.get(), pool);
+
+                    for (int i = 0; i < encrypted_size; i++)
+                    {
+                        for (int j = 0; j < coeff_mod_count; j++)
+                        {
+                            multiply_poly_mono_coeffmod(encrypted.pointer(i) + (j * coeff_count), coeff_count,
+                                decomposed_coeff[j], mono_power, coeff_modulus_[j], encrypted.mutable_pointer(i) + (j * coeff_count), pool);
+                        }
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < encrypted_size; i++)
+                    {
+                        for (int j = 0; j < coeff_mod_count; j++)
+                        {
+                            multiply_poly_mono_coeffmod(encrypted.pointer(i) + (j * coeff_count), coeff_count,
+                                plain[j], mono_power, coeff_modulus_[j], encrypted.mutable_pointer(i) + (j * coeff_count), pool);
+                        }
+                    }
+                }
+                return;
+            }
+            else
+            {
+                // Need for lift plain coefficient in RNS form regarding to each qi
+                if (plain[mono_power] >= plain_upper_half_threshold_)
+                {
+                    for (int i = 0; i < encrypted_size; i++)
+                    {
+                        for (int j = 0; j < coeff_mod_count; j++)
+                        {
+                            multiply_poly_mono_coeffmod(encrypted.pointer(i) + (j * coeff_count), coeff_count,
+                                plain[mono_power] + plain_upper_half_increment_array_[j], mono_power, coeff_modulus_[j],
+                                encrypted.mutable_pointer(i) + (j * coeff_count), pool);
+                        }
+                    }
+                }
+                // No need for lifting
+                else
+                {
+                    for (int i = 0; i < encrypted_size; i++)
+                    {
+                        for (int j = 0; j < coeff_mod_count; j++)
+                        {
+                            multiply_poly_mono_coeffmod(encrypted.pointer(i) + (j * coeff_count), coeff_count,
+                                plain[mono_power], mono_power, coeff_modulus_[j], encrypted.mutable_pointer(i) + (j * coeff_count), pool);
                         }
                     }
                 }

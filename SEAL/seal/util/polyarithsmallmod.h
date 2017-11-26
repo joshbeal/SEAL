@@ -154,6 +154,40 @@ namespace seal
 #endif
         }
 
+        inline void multiply_poly_mono_coeffmod(const std::uint64_t *poly, int coeff_count, std::uint64_t mono_coeff, int mono_power, const SmallModulus &modulus, std::uint64_t *result, MemoryPool &pool)
+        {
+#ifdef SEAL_DEBUG
+            if (poly == nullptr && coeff_count > 0)
+            {
+                throw std::invalid_argument("poly");
+            }
+            if (coeff_count < 0)
+            {
+                throw std::invalid_argument("coeff_count");
+            }
+            if (result == nullptr && coeff_count > 0)
+            {
+                throw std::invalid_argument("result");
+            }
+            if (modulus.is_zero())
+            {
+                throw std::invalid_argument("modulus");
+            }
+#endif
+            Pointer intermediate(allocate_uint(coeff_count, pool));
+            for (int i = 0; i < coeff_count - 1; i++)
+            {
+                int i_shift = i + mono_power;
+                if (i_shift >= (coeff_count - 1))  {
+                    intermediate[i_shift - (coeff_count - 1)] = multiply_uint_uint_mod(poly[i], modulus.value() - mono_coeff, modulus);
+                } else {
+                    intermediate[i_shift] = multiply_uint_uint_mod(poly[i], mono_coeff, modulus);
+                }
+            }
+            intermediate[coeff_count - 1] = poly[coeff_count - 1];
+            set_uint_uint(intermediate.get(), coeff_count, result);
+        }
+
         void multiply_poly_poly_coeffmod(const std::uint64_t *operand1, int operand1_coeff_count, const std::uint64_t *operand2, int operand2_coeff_count,
             const SmallModulus &modulus, int result_coeff_count, std::uint64_t *result);
 

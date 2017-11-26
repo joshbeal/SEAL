@@ -436,6 +436,31 @@ namespace seal
             return 0;
         }
 
+        inline int get_nonzero_coeff_count_poly(const std::uint64_t *poly, int coeff_count, int coeff_uint64_count)
+        {
+#ifdef SEAL_DEBUG
+            if (poly == nullptr && coeff_count > 0 && coeff_uint64_count > 0)
+            {
+                throw std::invalid_argument("poly");
+            }
+            if (coeff_count < 0)
+            {
+                throw std::invalid_argument("coeff_count");
+            }
+            if (coeff_uint64_count < 0)
+            {
+                throw std::invalid_argument("coeff_uint64_count");
+            }
+#endif
+            int weight = 0;
+            int uint64_count = coeff_count * coeff_uint64_count;
+            for (int i = 0; i < uint64_count; i++)
+            {
+                weight += (int)(*poly++ > 0);
+            }
+            return weight;
+        }
+
         inline ConstPointer duplicate_poly_if_needed(const std::uint64_t *poly, int coeff_count, int coeff_uint64_count, int new_coeff_count, int new_coeff_uint64_count, bool force, MemoryPool &pool)
         {
 #ifdef SEAL_DEBUG

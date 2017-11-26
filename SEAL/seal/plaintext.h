@@ -653,6 +653,18 @@ namespace seal
         }
 
         /**
+        Returns the nonzero coefficient count  of the current plaintext polynomial.
+        */
+        inline int nonzero_coeff_count() const
+        {
+            if (coeff_count_ == 0)
+            {
+                return 0;
+            }
+            return util::get_nonzero_coeff_count_poly(plaintext_poly_.get(), coeff_count_, 1);
+        }
+
+        /**
         Returns a human-readable string description of the plaintext polynomial.
 
         The returned string is of the form "7FFx^3 + 1x^1 + 3" with a format summarized by the following:
