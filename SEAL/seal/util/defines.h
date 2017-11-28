@@ -19,7 +19,7 @@
 // parameter compatibility checks pass in cases where they normally 
 // should not pass. Please note that it is extremely easy to break 
 // things by doing this, and the consequences can be unexpected.
-#undef SEAL_EXPOSE_MUTABLE_HASH_BLOCK
+//#define SEAL_EXPOSE_MUTABLE_HASH_BLOCK
 
 // Allow ciphertext data to be directly modified by exposing the
 // functions seal::Ciphertext::mutable_pointer(int) and 
@@ -28,11 +28,11 @@
 // way of mutating ciphertext data is by allocating memory manually, 
 // and using aliased ciphertexts pointing to the allocated memory, 
 // which can then be mutated freely.
-#undef SEAL_EXPOSE_MUTABLE_CIPHERTEXT
+//#define SEAL_EXPOSE_MUTABLE_CIPHERTEXT
 
 // For security reasons one should never throw when decoding fails due
 // to overflow, but in some cases this might help in diagnosing problems.
-#undef SEAL_THROW_ON_DECODER_OVERFLOW
+//#define SEAL_THROW_ON_DECODER_OVERFLOW
 
 // Multiplication by a plaintext zero should not be allowed, and by
 // default SEAL throws an error in this case. For performance reasons
@@ -41,7 +41,7 @@
 #define SEAL_THROW_ON_MULTIPLY_PLAIN_BY_ZERO
 
 // Compile for big-endian system (not implemented)
-#undef SEAL_BIG_ENDIAN
+//#define SEAL_BIG_ENDIAN
 
 // Bound on the bit-length of user-defined moduli
 #define SEAL_USER_MODULO_BIT_BOUND 60
