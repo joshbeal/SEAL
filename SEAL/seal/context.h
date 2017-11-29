@@ -166,9 +166,9 @@ namespace seal
         }
 
         /**
-        Returns an instance of EncryptionParameterQualifiers corresponding to the current
-        given encryption parameters. Note that to change the qualifiers it is necessary 
-        to create a new instance of SEALContext once appropriate changes to the encryption
+        Returns a copy of EncryptionParameterQualifiers corresponding to the current
+        encryption parameters. Note that to change the qualifiers it is necessary to 
+        create a new instance of SEALContext once appropriate changes to the encryption
         parameters have been made.
         */
         inline EncryptionParameterQualifiers qualifiers() const

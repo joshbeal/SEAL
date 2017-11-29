@@ -212,7 +212,8 @@ namespace Microsoft
                 SEALContext(EncryptionParameters ^parms, MemoryPoolHandle ^pool);
 
                 /**
-                <summary>Creates a new SEALContext instance by creating a deep copy of a given instance.</summary>
+                <summary>Creates a new SEALContext instance by creating a deep copy of a given 
+                instance.</summary>
 
                 <param name="copy">The SEALContext to copy from</param>
                 <exception cref="System::ArgumentNullException">if copy is null</exception>
@@ -220,21 +221,21 @@ namespace Microsoft
                 SEALContext(SEALContext ^copy);
 
                 /**
-                <summary>Returns a constant reference to the underlying encryption parameters.</summary>
+                <summary>Returns a copy of the underlying encryption parameters.</summary>
                 */
                 property EncryptionParameters ^Parms {
                     EncryptionParameters ^get();
                 }
 
                 /**
-                <summary>Returns an instance of EncryptionParameterQualifiers corresponding to the current
-                given encryption parameters.</summary>
+                <summary>Returns a copy of EncryptionParameterQualifiers corresponding to the current
+                encryption parameters.</summary>
                 
                 </remarks>
-                Returns an instance of <see cref="EncryptionParameterQualifiers" /> corresponding to 
-                the current given encryption parameters. Note that to change the qualifiers it is 
-                necessary to create a new instance of SEALContext once appropriate changes to the 
-                encryption parameters have been made.
+                Returns a copy of <see cref="EncryptionParameterQualifiers" /> corresponding to 
+                the current encryption parameters. Note that to change the qualifiers it is necessary 
+                to create a new instance of SEALContext once appropriate changes to the encryption 
+                parameters have been made.
                 */
                 property EncryptionParameterQualifiers ^Qualifiers {
                     EncryptionParameterQualifiers ^get();
