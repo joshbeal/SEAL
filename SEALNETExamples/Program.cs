@@ -77,34 +77,8 @@ namespace SEALNETExamples
             Console.WriteLine("");
         }
 
-        private static void SEALMemoryPoolCleanUp(Object sender, EventArgs e)
-        {
-            /*
-            The function MemoryPoolHandle.ClearGlobalMemoryPool() should be called before 
-            process exit to release all memory allocated by the global SEAL memory pool.
-            */
-            Console.Write("\nReleasing {0} MB from global memory pool: ",
-                    MemoryPoolHandle.Global().AllocByteCount >> 20);
-            MemoryPoolHandle.ClearGlobalMemoryPool();
-            Console.WriteLine("Done");
-
-            /*
-            Give it enough time to finish up.
-            */
-            System.Threading.Thread.Sleep(4000);
-
-        }
-
         public static void Main()
         {
-            /*
-            It is critically important to deallocate the global memory pool of the
-            C++ library before exiting the managed application. This can be done by
-            calling the function MemoryPoolHandle.DestroyGlobalMemoryPool() at process
-            exit through a new event handler (see above).
-            */
-            AppDomain.CurrentDomain.ProcessExit += new EventHandler(SEALMemoryPoolCleanUp);
-
             while (true)
             {
                 Console.WriteLine("\nSEAL Examples:\n");
@@ -152,7 +126,6 @@ namespace SEALNETExamples
 
                     case 5:
                         ExampleParameterSelection();
-
                         break;
 
                     case 0:
@@ -520,9 +493,7 @@ namespace SEALNETExamples
             Console.WriteLine($"Decoded integer: {encoder.DecodeInt32(plainResult)}");
 
             /*
-            We finish by running garbage collection to make sure all local objects are
-            destroyed and memory returned to the memory pool. This is very important to
-            ensure correct behavior of the SEAL memory pool in .NET applications.
+			Run garbage collection to help the global memory pool.
             */
             GC.Collect();
         }
@@ -802,9 +773,7 @@ namespace SEALNETExamples
             */
 
             /*
-            We finish by running garbage collection to make sure all local objects are
-            destroyed and memory returned to the memory pool. This is very important to
-            ensure correct behavior of the SEAL memory pool in .NET applications.
+			Run garbage collection to help the global memory pool.
             */
             GC.Collect();
         }
@@ -959,9 +928,7 @@ namespace SEALNETExamples
             Console.WriteLine($"Weighted average: {result}");
 
             /*
-            We finish by running garbage collection to make sure all local objects are
-            destroyed and memory returned to the memory pool. This is very important to
-            ensure correct behavior of the SEAL memory pool in .NET applications.
+			Run garbage collection to help the global memory pool.
             */
             GC.Collect();
         }
@@ -1106,9 +1073,7 @@ namespace SEALNETExamples
                 decryptor.InvariantNoiseBudget(deg3Term));
 
             /*
-            We finish by running garbage collection to make sure all local objects are
-            destroyed and memory returned to the memory pool. This is very important to
-            ensure correct behavior of the SEAL memory pool in .NET applications.
+			Run garbage collection to help the global memory pool.
             */
             GC.Collect();
         }
@@ -1348,9 +1313,7 @@ namespace SEALNETExamples
             */
 
             /*
-            We finish by running garbage collection to make sure all local objects are
-            destroyed and memory returned to the memory pool. This is very important to
-            ensure correct behavior of the SEAL memory pool in .NET applications.
+			Run garbage collection to help the global memory pool.
             */
             GC.Collect();
         }

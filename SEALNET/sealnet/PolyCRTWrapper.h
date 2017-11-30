@@ -320,11 +320,9 @@ namespace Microsoft
                 the local <see cref="MemoryPoolHandle" />.
                 </remarks>
                 <param name="plain">The matrix of integers modulo plaintext modulus to batch</param>
-                <param name="pool">The MemoryPoolHandle pointing to a valid memory pool</param>
                 <exception cref="System::ArgumentException">if plain is not valid for the encryption
                 parameters</exception>
-                <exception cref="System::ArgumentException">if pool is uninitialized</exception>
-                <exception cref="System::ArgumentNullException">if plain or pool is null</exception>
+                <exception cref="System::ArgumentNullException">if plain is null</exception>
                 */
                 void Decompose(Plaintext ^plain);
 

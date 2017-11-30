@@ -198,7 +198,7 @@ namespace seal
         /**
         The vector of Galois keys.
         */
-        std::vector<std::vector<Ciphertext> >  keys_;
+        std::vector<std::vector<Ciphertext> > keys_;
 
         int decomposition_bit_count_ = 0;
 
