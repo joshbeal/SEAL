@@ -98,6 +98,8 @@ void example_performance_mt(int th_count);
 
 int main()
 {
+    cout << "SEAL version: " << SEAL_VERSION_STRING << endl;
+
     while (true)
     {
         cout << "\nSEAL Examples:" << endl << endl;

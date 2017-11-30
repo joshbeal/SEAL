@@ -6,6 +6,9 @@
 #define SEAL_DEBUG
 #endif
 
+// SEAL version
+#define SEAL_VERSION_STRING "v2.3.0-3-dev"
+
 // For security reasons one should never throw when decoding fails due
 // to overflow, but in some cases this might help in diagnosing problems.
 #undef SEAL_THROW_ON_DECODER_OVERFLOW
