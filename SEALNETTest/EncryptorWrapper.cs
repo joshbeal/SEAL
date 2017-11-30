@@ -12,11 +12,11 @@ namespace SEALNETTest
         {
             var parms = new EncryptionParameters();
             var plain_modulus = new SmallModulus(1 << 6);
-            parms.SetNoiseStandardDeviation(3.19);
-            parms.SetPlainModulus(plain_modulus);
+            parms.NoiseStandardDeviation = 3.19;
+            parms.PlainModulus = plain_modulus;
             {
-                parms.SetPolyModulus("1x^64 + 1");
-                parms.SetCoeffModulus(new List<SmallModulus> { DefaultParams.SmallMods60Bit(0) });
+                parms.PolyModulus = "1x^64 + 1";
+                parms.CoeffModulus = new List<SmallModulus> { DefaultParams.SmallMods60Bit(0) };
                 var context = new SEALContext(parms);
 
                 var keygen = new KeyGenerator(context);
@@ -68,8 +68,8 @@ namespace SEALNETTest
                 Assert.AreEqual(encrypted.HashBlock, parms.HashBlock);
             }
             {
-                parms.SetPolyModulus("1x^128 + 1");
-                parms.SetCoeffModulus(new List<SmallModulus> { DefaultParams.SmallMods40Bit(0), DefaultParams.SmallMods40Bit(1) });
+                parms.PolyModulus = "1x^128 + 1";
+                parms.CoeffModulus = new List<SmallModulus> { DefaultParams.SmallMods40Bit(0), DefaultParams.SmallMods40Bit(1) };
                 var context = new SEALContext(parms);
                 var keygen = new KeyGenerator(context);
 
@@ -122,10 +122,9 @@ namespace SEALNETTest
             }
 
             {
-                parms.SetPolyModulus("1x^256 + 1");
-                parms.SetCoeffModulus(new List<SmallModulus> {
-                    DefaultParams.SmallMods40Bit(0), DefaultParams.SmallMods40Bit(1), DefaultParams.SmallMods40Bit(2)
-                });
+                parms.PolyModulus = "1x^256 + 1";
+                parms.CoeffModulus = new List<SmallModulus> {
+                    DefaultParams.SmallMods40Bit(0), DefaultParams.SmallMods40Bit(1), DefaultParams.SmallMods40Bit(2) };
                 var context = new SEALContext(parms);
                 var keygen = new KeyGenerator(context);
 

@@ -186,6 +186,19 @@ namespace Microsoft
                 */
                 !SmallModulus();
 
+                /**
+                <summary>Creates a SmallModulus instance.</summary>
+
+                <remarks>
+                Creates a SmallModulus instance. The value of the SmallModulus is set to
+                the given value.
+                </remarks>
+                <param name="value">The integer modulus</param>
+                <exception cref="System::ArgumentException">if value is 1 or more than
+                62 bits</exception>
+                */
+                static operator SmallModulus ^(System::UInt64 value);
+
             internal:
                 /**
                 <summary>Creates a deep copy of a C++ SmallModulus instance.</summary>

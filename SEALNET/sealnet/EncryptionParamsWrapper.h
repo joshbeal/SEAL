@@ -111,145 +111,94 @@ namespace Microsoft
                 */
                 void Set(EncryptionParameters ^assign);
 
-                /**
-                <summary>Sets the polynomial modulus parameter to the specified value.</summary>
-
-                <remarks>
-                Sets the polynomial modulus parameter to the specified value (represented by
-                <see cref="BigPoly" />). The polynomial modulus directly affects the number 
-                of coefficients in plaintext polynomials, the size of ciphertext elements, the 
-                computational performance of the scheme (bigger is worse), and the security 
-                level (bigger is better). In SEAL the polynomial modulus must be of the form 
-                "1x^N + 1", where N is a power of 2 (e.g. 1024, 2048, 4096, 8192, 16384, or 32768).
-                </remarks>
-                <param name="polyModulus">The new polynomial modulus</param>
-                <exception cref="System::ArgumentNullException">if polyModulus is null</exception>
-                */
-                void SetPolyModulus(BigPoly ^polyModulus);
-
-                /**
-                <summary>Sets the polynomial modulus parameter to the specified value.</summary>
-
-                <remarks>
-                Sets the polynomial modulus parameter to the specified value (represented by
-                <see cref="System::String" />). The polynomial modulus directly affects the 
-                number of coefficients in plaintext polynomials, the size of ciphertext elements,
-                the computational performance of the scheme (bigger is worse), and the security
-                level (bigger is better). In SEAL the polynomial modulus must be of the form 
-                "1x^N + 1", where N is a power of 2 (e.g. 1024, 2048, 4096, 8192, 16384, or 32768).
-                </remarks>
-                <param name="polyModulus">The new polynomial modulus</param>
-                <exception cref="System::ArgumentNullException">if polyModulus is null</exception>
-                */
-                void SetPolyModulus(System::String ^polyModulus);
-
-                /**
-                <summary>Sets the coefficient modulus parameter.</summary>
-
-                <remarks>
-                Sets the coefficient modulus parameter. The coefficient modulus consists of a list 
-                of distinct prime numbers, and is represented by a list of <see cref="SmallModulus" />
-                objects. The coefficient modulus directly affects the size of ciphertext elements, 
-                the amount of computation that the scheme can perform (bigger is better), and the 
-                security level (bigger is worse). In SEAL each of the prime numbers in the coefficient
-                modulus must be at most 60 bits, and must be congruent to 1 modulo 2*degree(PolyModulus).
-                </remarks>
-                <param name="coeffModulus">The new coefficient modulus</param>
-                <exception cref="System::ArgumentNullException">if coeffModulus is null</exception>
-                */
-                void SetCoeffModulus(System::Collections::Generic::List<SmallModulus^> ^coeffModulus);
-
-                /**
-                <summary>Sets the coefficient modulus parameter.</summary>
-
-                <remarks>
-                Sets the coefficient modulus parameter. The coefficient modulus consists of a list
-                of distinct prime numbers, and is represented by a list of <see cref="SmallModulus" />
-                objects. This constructor instead takes a list of System::UInt64 and automatically
-                creates the <see cref="SmallModulus" /> objects. The coefficient modulus directly 
-                affects the size of ciphertext elements, the amount of computation that the scheme can
-                perform (bigger is better), and the security level (bigger is worse). In SEAL each of 
-                the prime numbers in the coefficient modulus must be at most 60 bits, and must be 
-                congruent to 1 modulo 2*degree(PolyModulus).
-                </remarks>
-                <param name="coeffModulus">The new coefficient modulus</param>
-                <exception cref="System::ArgumentNullException">if coeffModulus is null</exception>
-                */
-                void SetCoeffModulus(System::Collections::Generic::List<System::UInt64> ^coeffModulus);
-
-                /**
-                <summary>Sets the plaintext modulus parameter.</summary>
-
-                <remarks>
-                Sets the plaintext modulus parameter. The plaintext modulus is an integer modulus
-                represented by the <see cref="SmallModulus" /> class. The plaintext modulus determines 
-                the largest coefficient that plaintext polynomials can represent. It also affects the 
-                amount of computation that the scheme can perform (bigger is worse). In SEAL the 
-                plaintext modulus can be at most 60 bits long, but can otherwise be any integer. Note, 
-                however, that some features (e.g. batching) require the plaintext modulus to be of 
-                a particular form.
-                </remarks>
-                <param name="plainModulus">The new plaintext modulus</param>
-                <exception cref="System::ArgumentNullException">if plainModulus is null</exception>
-                */
-                void SetPlainModulus(SmallModulus ^plainModulus);
-
-                /**
-                <summary>Sets the plaintext modulus parameter.</summary>
-
-                <remarks>
-                Sets the plaintext modulus parameter. The plaintext modulus is an integer modulus
-                represented by the <see cref="SmallModulus" /> class. This constructor instead takes
-                a System::UInt64 and automatically creates the <see cref="SmallModulus" /> object.
-                The plaintext modulus determines the largest coefficient that plaintext polynomials 
-                can represent. It also affects the amount of computation that the scheme can perform 
-                (bigger is worse). In SEAL the plaintext modulus can be at most 60 bits long, but can
-                otherwise be any integer. Note, however, that some features (e.g. batching) require
-                the plaintext modulus to be of a particular form.
-                </remarks>
-                <param name="plainModulus">The new plaintext modulus</param>
-                */
-                void SetPlainModulus(System::UInt64 plainModulus);
-
-                /**
-                <summary>Sets the standard deviation of the noise distribution used for error 
-                sampling.</summary>
-
-                <remarks>
-                Sets the standard deviation of the noise distribution used for error sampling. This
-                parameter directly affects the security level of the scheme. However, it should not be
-                necessary for most users to change this parameter from its default value.
-                </remarks>
-                <param name="value">The new standard deviation</param>
-                */
-                void SetNoiseStandardDeviation(double value);
-
-                /**
-                <summary>Returns a copy of the currently set polynomial modulus parameter.</summary>
-                */
                 property BigPoly ^PolyModulus {
+                    /**
+                    <summary>Returns a copy of the currently set polynomial modulus parameter.</summary>
+                    */
                     BigPoly ^get();
+
+                    /**
+                    <summary>Sets the polynomial modulus parameter to the specified value.</summary>
+
+                    <remarks>
+                    Sets the polynomial modulus parameter to the specified value (represented by
+                    <see cref="BigPoly" />). The polynomial modulus directly affects the number
+                    of coefficients in plaintext polynomials, the size of ciphertext elements, the
+                    computational performance of the scheme (bigger is worse), and the security
+                    level (bigger is better). In SEAL the polynomial modulus must be of the form
+                    "1x^N + 1", where N is a power of 2 (e.g. 1024, 2048, 4096, 8192, 16384, or 32768).
+                    </remarks>
+                    <param name="polyModulus">The new polynomial modulus</param>
+                    <exception cref="System::ArgumentNullException">if polyModulus is null</exception>
+                    */
+                    void set(BigPoly ^polyModulus);
                 }
 
-                /**
-                <summary>Returns a copy of the currently set coefficient modulus parameter.</summary>
-                */
                 property System::Collections::Generic::List<SmallModulus^> ^CoeffModulus {
+                    /**
+                    <summary>Returns a copy of the currently set coefficient modulus parameter.</summary>
+                    */
                     System::Collections::Generic::List<SmallModulus^> ^get();
+
+                    /**
+                    <summary>Sets the coefficient modulus parameter.</summary>
+
+                    <remarks>
+                    Sets the coefficient modulus parameter. The coefficient modulus consists of a list
+                    of distinct prime numbers, and is represented by a list of <see cref="SmallModulus" />
+                    objects. The coefficient modulus directly affects the size of ciphertext elements,
+                    the amount of computation that the scheme can perform (bigger is better), and the
+                    security level (bigger is worse). In SEAL each of the prime numbers in the coefficient
+                    modulus must be at most 60 bits, and must be congruent to 1 modulo 2*degree(PolyModulus).
+                    </remarks>
+                    <param name="coeffModulus">The new coefficient modulus</param>
+                    <exception cref="System::ArgumentNullException">if coeffModulus is null</exception>
+                    */
+                    void set(System::Collections::Generic::List<SmallModulus^> ^coeffModulus);
                 }
 
-                /**
-                <summary>Returns a copy of the currently set plaintext modulus parameter.</summary>
-                */
                 property SmallModulus ^PlainModulus {
+                    /**
+                    <summary>Returns a copy of the currently set plaintext modulus parameter.</summary>
+                    */
                     SmallModulus ^get();
+
+                    /**
+                    <summary>Sets the plaintext modulus parameter.</summary>
+
+                    <remarks>
+                    Sets the plaintext modulus parameter. The plaintext modulus is an integer modulus
+                    represented by the <see cref="SmallModulus" /> class. The plaintext modulus determines
+                    the largest coefficient that plaintext polynomials can represent. It also affects the
+                    amount of computation that the scheme can perform (bigger is worse). In SEAL the
+                    plaintext modulus can be at most 60 bits long, but can otherwise be any integer. Note,
+                    however, that some features (e.g. batching) require the plaintext modulus to be of
+                    a particular form.
+                    </remarks>
+                    <param name="plainModulus">The new plaintext modulus</param>
+                    <exception cref="System::ArgumentNullException">if plainModulus is null</exception>
+                    */
+                    void set(SmallModulus ^plainModulus);
                 }
 
-                /**
-                <summary>Returns the currently set standard deviation of the noise distribution.</summary>
-                */
                 property double NoiseStandardDeviation {
+                    /**
+                    <summary>Returns the currently set standard deviation of the noise distribution.</summary>
+                    */
                     double get();
+
+                    /**
+                    <summary>Sets the standard deviation of the noise distribution used for error
+                    sampling.</summary>
+
+                    <remarks>
+                    Sets the standard deviation of the noise distribution used for error sampling. This
+                    parameter directly affects the security level of the scheme. However, it should not be
+                    necessary for most users to change this parameter from its default value.
+                    </remarks>
+                    <param name="value">The new standard deviation</param>
+                    */
+                    void set(double value);
                 }
 
                 /**

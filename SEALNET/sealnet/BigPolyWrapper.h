@@ -530,6 +530,38 @@ namespace Microsoft
                 */
                 void DuplicateFrom(BigPoly ^value);
 
+                /**
+                <summary>Creates a BigPoly populated and minimally sized to fit the polynomial described by the formatted 
+                string.</summary>
+                
+                <remarks>
+                <para>
+                Creates a BigPoly populated and minimally sized to fit the polynomial described by the formatted string.
+                </para>
+                <para>
+                The string description of the polynomial must adhere to the format returned by <see cref="ToString()"/>,
+                which is of the form "7FFx^3 + 1x^1 + 3" and summarized by the following rules:
+                <list type="number">
+                <item><description>Terms are listed in order of strictly decreasing exponent</description></item>
+                <item><description>Coefficient values are non-negative and in hexadecimal format (upper and lower case
+                letters are both supported)</description></item>
+                <item><description>Exponents are positive and in decimal format</description></item>
+                <item><description>Zero coefficient terms (including the constant term) may be (but do not have to be) 
+                omitted</description></item>
+                <item><description>Term with the exponent value of one is written as x^1</description></item>
+                <item><description>Term with the exponent value of zero (the constant term) is written as just a hexadecimal 
+                number without x or exponent</description></item>
+                <item><description>Terms are separated exactly by &lt;space&gt;+&lt;space&gt;</description></item>
+                <item><description>Other than the +, no other terms have whitespace</description></item>
+                </list>
+                </para>
+                </remarks>
+                <param name="hexPoly">The formatted polynomial string specifying the initial value</param>
+                <exception cref="System::ArgumentNullException">if hexPoly is null</exception>
+                <exception cref="System::ArgumentException">if hexPoly does not adhere to the expected format</exception>
+                */
+                static operator BigPoly ^(System::String ^hexPoly);
+
             internal:
                 /**
                 <summary>Creates a deep copy of a C++ BigPoly.</summary>

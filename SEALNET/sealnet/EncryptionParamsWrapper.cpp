@@ -1,12 +1,9 @@
-#include <msclr\marshal_cppstd.h>
-#include <cstddef>
 #include "sealnet/EncryptionParamsWrapper.h"
 #include "sealnet/Common.h"
 
 using namespace System;
 using namespace System::IO;
 using namespace System::Collections::Generic;
-using namespace msclr::interop;
 using namespace std;
 
 namespace seal
@@ -156,7 +153,7 @@ namespace Microsoft
                 }
             }
 
-            void EncryptionParameters::SetPolyModulus(BigPoly ^polyModulus)
+            void EncryptionParameters::PolyModulus::set(BigPoly ^polyModulus)
             {
                 if (parms_ == nullptr)
                 {
@@ -181,37 +178,7 @@ namespace Microsoft
                 }
             }
 
-            void EncryptionParameters::SetPolyModulus(String ^polyModulus)
-            {
-                if (parms_ == nullptr)
-                {
-                    throw gcnew ObjectDisposedException("EncryptionParameters is disposed");
-                }
-                if (polyModulus == nullptr)
-                {
-                    throw gcnew ArgumentNullException("polyModulus cannot be null");
-                }
-                marshal_context ^context = gcnew marshal_context();
-                try
-                {
-                    parms_->set_poly_modulus(context->marshal_as<const char*>(polyModulus));
-                    GC::KeepAlive(polyModulus);
-                }
-                catch (const exception &e)
-                {
-                    HandleException(&e);
-                }
-                catch (...)
-                {
-                    HandleException(nullptr);
-                }
-                finally
-                {
-                    delete context;
-                }
-            }
-
-            void EncryptionParameters::SetCoeffModulus(List<SmallModulus^> ^coeffModulus)
+            void EncryptionParameters::CoeffModulus::set(List<SmallModulus^> ^coeffModulus)
             {
                 if (parms_ == nullptr)
                 {
@@ -246,37 +213,7 @@ namespace Microsoft
                 }
             }
 
-            void EncryptionParameters::SetCoeffModulus(List<UInt64> ^coeffModulus)
-            {
-                if (parms_ == nullptr)
-                {
-                    throw gcnew ObjectDisposedException("EncryptionParameters is disposed");
-                }
-                if (coeffModulus == nullptr)
-                {
-                    throw gcnew ArgumentNullException("coeffModulus cannot be null");
-                }
-                try
-                {
-                    vector<seal::SmallModulus> v_coeff_modulus;
-                    for each (UInt64 mod in coeffModulus)
-                    {
-                        v_coeff_modulus.emplace_back(mod);
-                    }
-                    parms_->set_coeff_modulus(v_coeff_modulus);
-                    GC::KeepAlive(coeffModulus);
-                }
-                catch (const exception &e)
-                {
-                    HandleException(&e);
-                }
-                catch (...)
-                {
-                    HandleException(nullptr);
-                }
-            }
-
-            void EncryptionParameters::SetPlainModulus(SmallModulus ^plainModulus)
+            void EncryptionParameters::PlainModulus::set(SmallModulus ^plainModulus)
             {
                 if (parms_ == nullptr)
                 {
@@ -290,26 +227,6 @@ namespace Microsoft
                 {
                     parms_->set_plain_modulus(plainModulus->GetModulus());
                     GC::KeepAlive(plainModulus);
-                }
-                catch (const exception &e)
-                {
-                    HandleException(&e);
-                }
-                catch (...)
-                {
-                    HandleException(nullptr);
-                }
-            }
-
-            void EncryptionParameters::SetPlainModulus(UInt64 plainModulus)
-            {
-                if (parms_ == nullptr)
-                {
-                    throw gcnew ObjectDisposedException("EncryptionParameters is disposed");
-                }
-                try
-                {
-                    parms_->set_plain_modulus(plainModulus);
                 }
                 catch (const exception &e)
                 {
@@ -362,7 +279,7 @@ namespace Microsoft
                 return parms_->noise_standard_deviation();
             }
 
-            void EncryptionParameters::SetNoiseStandardDeviation(double value)
+            void EncryptionParameters::NoiseStandardDeviation::set(double value)
             {
                 if (parms_ == nullptr)
                 {

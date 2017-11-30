@@ -582,6 +582,11 @@ namespace Microsoft
                     HandleException(nullptr);
                 }
             }
+
+            BigPoly::operator BigPoly ^(String ^hexPoly)
+            {
+                return gcnew BigPoly(hexPoly);
+            }
         }
     }
 }

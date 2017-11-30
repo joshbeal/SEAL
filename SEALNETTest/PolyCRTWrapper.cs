@@ -13,9 +13,9 @@ namespace SEALNETTest
         public void BatchUnbatchUIntVectorNET()
         {
             var parms = new EncryptionParameters();
-            parms.SetPolyModulus("1x^64 + 1");
-            parms.SetCoeffModulus(new List<SmallModulus> { DefaultParams.SmallMods60Bit(0) });
-            parms.SetPlainModulus(257);
+            parms.PolyModulus = "1x^64 + 1";
+            parms.CoeffModulus = new List<SmallModulus> { DefaultParams.SmallMods60Bit(0) };
+            parms.PlainModulus = 257;
 
             var context = new SEALContext(parms);
             Assert.IsTrue(context.Qualifiers.EnableBatching);
@@ -67,9 +67,9 @@ namespace SEALNETTest
         public void BatchUnbatchIntVectorNET()
         {
             var parms = new EncryptionParameters();
-            parms.SetPolyModulus("1x^64 + 1");
-            parms.SetCoeffModulus(new List<SmallModulus> { DefaultParams.SmallMods60Bit(0) });
-            parms.SetPlainModulus(257);
+            parms.PolyModulus = "1x^64 + 1";
+            parms.CoeffModulus = new List<SmallModulus> { DefaultParams.SmallMods60Bit(0) };
+            parms.PlainModulus = 257;
 
             var context = new SEALContext(parms);
             Assert.IsTrue(context.Qualifiers.EnableBatching);
@@ -121,9 +121,9 @@ namespace SEALNETTest
         public void BatchUnbatchPlaintextNET()
         {
             var parms = new EncryptionParameters();
-            parms.SetPolyModulus("1x^64 + 1");
-            parms.SetCoeffModulus(new List<SmallModulus> { DefaultParams.SmallMods60Bit(0) });
-            parms.SetPlainModulus(257);
+            parms.PolyModulus = "1x^64 + 1";
+            parms.CoeffModulus = new List<SmallModulus> { DefaultParams.SmallMods60Bit(0) };
+            parms.PlainModulus = 257;
 
             var context = new SEALContext(parms);
             Assert.IsTrue(context.Qualifiers.EnableBatching);

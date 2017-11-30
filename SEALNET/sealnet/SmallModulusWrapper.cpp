@@ -326,6 +326,11 @@ namespace Microsoft
                 }
                 return *modulus_;
             }
+
+            SmallModulus::operator SmallModulus ^(UInt64 value)
+            {
+                return gcnew SmallModulus(value);
+            }
         }
     }
 }

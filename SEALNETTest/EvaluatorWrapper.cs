@@ -14,10 +14,10 @@ namespace SEALNETTest
         {
             var parms = new EncryptionParameters();
             var plain_modulus = new SmallModulus(1 << 6);
-            parms.SetNoiseStandardDeviation(3.19);
-            parms.SetPlainModulus(plain_modulus);
-            parms.SetPolyModulus("1x^64 + 1");
-            parms.SetCoeffModulus(new List<SmallModulus> { DefaultParams.SmallMods40Bit(0) });
+            parms.NoiseStandardDeviation = 3.19;
+            parms.PlainModulus = plain_modulus;
+            parms.PolyModulus = "1x^64 + 1";
+            parms.CoeffModulus = new List<SmallModulus> { DefaultParams.SmallMods40Bit(0) };
             var context = new SEALContext(parms);
             var keygen = new KeyGenerator(context);
             var encoder = new BalancedEncoder(plain_modulus);
@@ -71,10 +71,10 @@ namespace SEALNETTest
         {
             var parms = new EncryptionParameters();
             var plain_modulus = new SmallModulus(1 << 6);
-            parms.SetNoiseStandardDeviation(3.19);
-            parms.SetPlainModulus(plain_modulus);
-            parms.SetPolyModulus("1x^64 + 1");
-            parms.SetCoeffModulus(new List<SmallModulus> { DefaultParams.SmallMods40Bit(0) });
+            parms.NoiseStandardDeviation = 3.19;
+            parms.PlainModulus = plain_modulus;
+            parms.PolyModulus = "1x^64 + 1";
+            parms.CoeffModulus = new List<SmallModulus> { DefaultParams.SmallMods40Bit(0) };
             var context = new SEALContext(parms);
             var keygen = new KeyGenerator(context);
             var encoder = new BalancedEncoder(plain_modulus);
@@ -153,10 +153,10 @@ namespace SEALNETTest
         {
             var parms = new EncryptionParameters();
             var plain_modulus = new SmallModulus(1 << 6);
-            parms.SetNoiseStandardDeviation(3.19);
-            parms.SetPlainModulus(plain_modulus);
-            parms.SetPolyModulus("1x^64 + 1");
-            parms.SetCoeffModulus(new List<SmallModulus> { DefaultParams.SmallMods40Bit(0) });
+            parms.NoiseStandardDeviation = 3.19;
+            parms.PlainModulus = plain_modulus;
+            parms.PolyModulus = "1x^64 + 1";
+            parms.CoeffModulus = new List<SmallModulus> { DefaultParams.SmallMods40Bit(0) };
             var context = new SEALContext(parms);
             var keygen = new KeyGenerator(context);
             var encoder = new BalancedEncoder(plain_modulus);
@@ -215,10 +215,10 @@ namespace SEALNETTest
         {
             var parms = new EncryptionParameters();
             var plain_modulus = new SmallModulus(1 << 6);
-            parms.SetNoiseStandardDeviation(3.19);
-            parms.SetPlainModulus(plain_modulus);
-            parms.SetPolyModulus("1x^64 + 1");
-            parms.SetCoeffModulus(new List<SmallModulus> { DefaultParams.SmallMods40Bit(0) });
+            parms.NoiseStandardDeviation = 3.19;
+            parms.PlainModulus = plain_modulus;
+            parms.PolyModulus = "1x^64 + 1";
+            parms.CoeffModulus = new List<SmallModulus> { DefaultParams.SmallMods40Bit(0) };
             var context = new SEALContext(parms);
             var keygen = new KeyGenerator(context);
             var encoder = new BalancedEncoder(plain_modulus);
@@ -268,10 +268,10 @@ namespace SEALNETTest
         {
             var parms = new EncryptionParameters();
             var plain_modulus = new SmallModulus(1 << 6);
-            parms.SetNoiseStandardDeviation(3.19);
-            parms.SetPlainModulus(plain_modulus);
-            parms.SetPolyModulus("1x^64 + 1");
-            parms.SetCoeffModulus(new List<SmallModulus> { DefaultParams.SmallMods40Bit(0) });
+            parms.NoiseStandardDeviation = 3.19;
+            parms.PlainModulus = plain_modulus;
+            parms.PolyModulus = "1x^64 + 1";
+            parms.CoeffModulus = new List<SmallModulus> { DefaultParams.SmallMods40Bit(0) };
             var context = new SEALContext(parms);
             var keygen = new KeyGenerator(context);
             var encoder = new BalancedEncoder(plain_modulus);
@@ -325,10 +325,10 @@ namespace SEALNETTest
         {
             var parms = new EncryptionParameters();
             var plain_modulus = new SmallModulus(1 << 6);
-            parms.SetNoiseStandardDeviation(3.19);
-            parms.SetPlainModulus(plain_modulus);
-            parms.SetPolyModulus("1x^64 + 1");
-            parms.SetCoeffModulus(new List<SmallModulus> { DefaultParams.SmallMods40Bit(0) });
+            parms.NoiseStandardDeviation = 3.19;
+            parms.PlainModulus = plain_modulus;
+            parms.PolyModulus = "1x^64 + 1";
+            parms.CoeffModulus = new List<SmallModulus> { DefaultParams.SmallMods40Bit(0) };
             var context = new SEALContext(parms);
             var keygen = new KeyGenerator(context);
             var encoder = new BalancedEncoder(plain_modulus);
@@ -382,10 +382,10 @@ namespace SEALNETTest
             {
                 var parms = new EncryptionParameters();
                 var plain_modulus = new SmallModulus(1 << 6);
-                parms.SetNoiseStandardDeviation(3.19);
-                parms.SetPlainModulus(plain_modulus);
-                parms.SetPolyModulus("1x^64 + 1");
-                parms.SetCoeffModulus(new List<SmallModulus> { DefaultParams.SmallMods40Bit(0) });
+                parms.NoiseStandardDeviation = 3.19;
+                parms.PlainModulus = plain_modulus;
+                parms.PolyModulus = "1x^64 + 1";
+                parms.CoeffModulus = new List<SmallModulus> { DefaultParams.SmallMods40Bit(0) };
                 var context = new SEALContext(parms);
                 var keygen = new KeyGenerator(context);
                 var encoder = new BalancedEncoder(plain_modulus);
@@ -449,12 +449,12 @@ namespace SEALNETTest
             {
                 var parms = new EncryptionParameters();
                 var plain_modulus = new SmallModulus(1 << 6);
-                parms.SetNoiseStandardDeviation(3.19);
-                parms.SetPlainModulus(plain_modulus);
-                parms.SetPolyModulus("1x^128 + 1");
-                parms.SetCoeffModulus(new List<SmallModulus> {
+                parms.NoiseStandardDeviation = 3.19;
+                parms.PlainModulus = plain_modulus;
+                parms.PolyModulus = "1x^128 + 1";
+                parms.CoeffModulus = new List<SmallModulus> {
                     DefaultParams.SmallMods40Bit(0), DefaultParams.SmallMods40Bit(1)
-                });
+                };
                 var context = new SEALContext(parms);
                 var keygen = new KeyGenerator(context);
                 var encoder = new BalancedEncoder(plain_modulus);
@@ -522,12 +522,12 @@ namespace SEALNETTest
         {
             var parms = new EncryptionParameters();
             var plain_modulus = new SmallModulus(1 << 6);
-            parms.SetNoiseStandardDeviation(3.19);
-            parms.SetPlainModulus(plain_modulus);
-            parms.SetPolyModulus("1x^128 + 1");
-            parms.SetCoeffModulus(new List<SmallModulus> {
+            parms.NoiseStandardDeviation = 3.19;
+            parms.PlainModulus = plain_modulus;
+            parms.PolyModulus = "1x^128 + 1";
+            parms.CoeffModulus = new List<SmallModulus> {
                     DefaultParams.SmallMods40Bit(0), DefaultParams.SmallMods40Bit(1)
-                });
+                };
             var context = new SEALContext(parms);
             var keygen = new KeyGenerator(context);
             var encoder = new BalancedEncoder(plain_modulus);
@@ -581,12 +581,12 @@ namespace SEALNETTest
         {
             var parms = new EncryptionParameters();
             var plain_modulus = new SmallModulus(1 << 6);
-            parms.SetNoiseStandardDeviation(3.19);
-            parms.SetPlainModulus(plain_modulus);
-            parms.SetPolyModulus("1x^128 + 1");
-            parms.SetCoeffModulus(new List<SmallModulus> {
+            parms.NoiseStandardDeviation = 3.19;
+            parms.PlainModulus = plain_modulus;
+            parms.PolyModulus = "1x^128 + 1";
+            parms.CoeffModulus = new List<SmallModulus> {
                     DefaultParams.SmallMods40Bit(0), DefaultParams.SmallMods40Bit(1)
-                });
+                };
             var context = new SEALContext(parms);
             var keygen = new KeyGenerator(context);
             var encoder = new BalancedEncoder(plain_modulus);
@@ -674,12 +674,12 @@ namespace SEALNETTest
         {
             var parms = new EncryptionParameters();
             var plain_modulus = new SmallModulus(1 << 6);
-            parms.SetNoiseStandardDeviation(3.19);
-            parms.SetPlainModulus(plain_modulus);
-            parms.SetPolyModulus("1x^128 + 1");
-            parms.SetCoeffModulus(new List<SmallModulus> {
+            parms.NoiseStandardDeviation = 3.19;
+            parms.PlainModulus = plain_modulus;
+            parms.PolyModulus = "1x^128 + 1";
+            parms.CoeffModulus = new List<SmallModulus> {
                     DefaultParams.SmallMods40Bit(0), DefaultParams.SmallMods40Bit(1)
-                });
+                };
             var context = new SEALContext(parms);
             var keygen = new KeyGenerator(context);
             var encoder = new BalancedEncoder(plain_modulus);
@@ -725,12 +725,12 @@ namespace SEALNETTest
             var parms = new EncryptionParameters();
             var plain_modulus = new SmallModulus(1 << 6);
             var poly_modulus = new BigPoly("1x^128 + 1");
-            parms.SetNoiseStandardDeviation(3.19);
-            parms.SetPlainModulus(plain_modulus);
-            parms.SetPolyModulus(poly_modulus);
-            parms.SetCoeffModulus(new List<SmallModulus> {
+            parms.NoiseStandardDeviation = 3.19;
+            parms.PlainModulus = plain_modulus;
+            parms.PolyModulus = poly_modulus;
+            parms.CoeffModulus = new List<SmallModulus> {
                     DefaultParams.SmallMods40Bit(0), DefaultParams.SmallMods40Bit(1)
-                });
+                };
             var context = new SEALContext(parms);
             var keygen = new KeyGenerator(context);
             var encoder = new BalancedEncoder(plain_modulus);
@@ -833,12 +833,12 @@ namespace SEALNETTest
         {
             var parms = new EncryptionParameters();
             var plain_modulus = new SmallModulus(1 << 6);
-            parms.SetNoiseStandardDeviation(3.19);
-            parms.SetPlainModulus(plain_modulus);
-            parms.SetPolyModulus("1x^128 + 1");
-            parms.SetCoeffModulus(new List<SmallModulus> {
+            parms.NoiseStandardDeviation = 3.19;
+            parms.PlainModulus = plain_modulus;
+            parms.PolyModulus = "1x^128 + 1";
+            parms.CoeffModulus = new List<SmallModulus> {
                     DefaultParams.SmallMods40Bit(0), DefaultParams.SmallMods40Bit(1)
-                });
+                };
             var context = new SEALContext(parms);
             var keygen = new KeyGenerator(context);
             var evaluator = new Evaluator(context);
@@ -871,12 +871,12 @@ namespace SEALNETTest
         {
             var parms = new EncryptionParameters();
             var plain_modulus = new SmallModulus(1 << 6);
-            parms.SetNoiseStandardDeviation(3.19);
-            parms.SetPlainModulus(plain_modulus);
-            parms.SetPolyModulus("1x^128 + 1");
-            parms.SetCoeffModulus(new List<SmallModulus> {
+            parms.NoiseStandardDeviation = 3.19;
+            parms.PlainModulus = plain_modulus;
+            parms.PolyModulus = "1x^128 + 1";
+            parms.CoeffModulus = new List<SmallModulus> {
                     DefaultParams.SmallMods40Bit(0), DefaultParams.SmallMods40Bit(1)
-                });
+                };
             var context = new SEALContext(parms);
             var keygen = new KeyGenerator(context);
 
@@ -917,12 +917,12 @@ namespace SEALNETTest
         {
             var parms = new EncryptionParameters();
             var plain_modulus = new SmallModulus(1 << 6);
-            parms.SetNoiseStandardDeviation(3.19);
-            parms.SetPlainModulus(plain_modulus);
-            parms.SetPolyModulus("1x^128 + 1");
-            parms.SetCoeffModulus(new List<SmallModulus> {
+            parms.NoiseStandardDeviation = 3.19;
+            parms.PlainModulus = plain_modulus;
+            parms.PolyModulus = "1x^128 + 1";
+            parms.CoeffModulus = new List<SmallModulus> {
                     DefaultParams.SmallMods40Bit(0), DefaultParams.SmallMods40Bit(1)
-                });
+                };
             var context = new SEALContext(parms);
             var keygen = new KeyGenerator(context);
 
@@ -987,12 +987,12 @@ namespace SEALNETTest
         {
             var parms = new EncryptionParameters();
             var plain_modulus = new SmallModulus(257);
-            parms.SetNoiseStandardDeviation(3.19);
-            parms.SetPlainModulus(plain_modulus);
-            parms.SetPolyModulus("1x^8 + 1");
-            parms.SetCoeffModulus(new List<SmallModulus> {
+            parms.NoiseStandardDeviation = 3.19;
+            parms.PlainModulus = plain_modulus;
+            parms.PolyModulus = "1x^8 + 1";
+            parms.CoeffModulus = new List<SmallModulus> {
                     DefaultParams.SmallMods40Bit(0), DefaultParams.SmallMods40Bit(1)
-                });
+                };
             var context = new SEALContext(parms);
             var keygen = new KeyGenerator(context);
             var glk = new GaloisKeys();

@@ -24,10 +24,10 @@ namespace SEALNETTest
             }
 
             // Not relatively prime coeff moduli
-            parms.SetPolyModulus("1x^4 + 1");
-            parms.SetCoeffModulus(new List<UInt64> { 2, 30 });
-            parms.SetPlainModulus(2);
-            parms.SetNoiseStandardDeviation(3.19);
+            parms.PolyModulus = "1x^4 + 1";
+            parms.CoeffModulus = new List<SmallModulus> { 2, 30 };
+            parms.PlainModulus = 2;
+            parms.NoiseStandardDeviation = 3.19;
             {
                 var context = new SEALContext(parms);
                 var qualifiers = context.Qualifiers;
@@ -39,10 +39,10 @@ namespace SEALNETTest
             }
 
             // Plain modulus not relatively prime to coeff moduli
-            parms.SetPolyModulus("1x^4 + 1");
-            parms.SetCoeffModulus(new List<UInt64> { 17, 41 });
-            parms.SetPlainModulus(34);
-            parms.SetNoiseStandardDeviation(3.19);
+            parms.PolyModulus = "1x^4 + 1";
+            parms.CoeffModulus = new List<SmallModulus> { 17, 41 };
+            parms.PlainModulus = 34;
+            parms.NoiseStandardDeviation = 3.19;
             {
                 var context = new SEALContext(parms);
                 var qualifiers = context.Qualifiers;
@@ -54,10 +54,10 @@ namespace SEALNETTest
             }
 
             // Plain modulus not smaller than product of coeff moduli
-            parms.SetPolyModulus("1x^4 + 1");
-            parms.SetCoeffModulus(new List<UInt64> { 2 });
-            parms.SetPlainModulus(3);
-            parms.SetNoiseStandardDeviation(3.19);
+            parms.PolyModulus = "1x^4 + 1";
+            parms.CoeffModulus = (new List<SmallModulus> { 2 });
+            parms.PlainModulus = 3;
+            parms.NoiseStandardDeviation = 3.19;
             {
                 var context = new SEALContext(parms);
                 var qualifiers = context.Qualifiers;
@@ -70,10 +70,10 @@ namespace SEALNETTest
             }
 
             // FFT poly but not NTT modulus
-            parms.SetPolyModulus("1x^4 + 1");
-            parms.SetCoeffModulus(new List<UInt64> { 3 });
-            parms.SetPlainModulus(2);
-            parms.SetNoiseStandardDeviation(3.19);
+            parms.PolyModulus = "1x^4 + 1";
+            parms.CoeffModulus = (new List<SmallModulus> { 3 });
+            parms.PlainModulus = 2;
+            parms.NoiseStandardDeviation = 3.19;
             {
                 var context = new SEALContext(parms);
                 var qualifiers = context.Qualifiers;
@@ -86,10 +86,10 @@ namespace SEALNETTest
             }
 
             // Parameters OK; no fast plain lift
-            parms.SetPolyModulus("1x^4 + 1");
-            parms.SetCoeffModulus(new List<UInt64> { 17, 41 });
-            parms.SetPlainModulus(18);
-            parms.SetNoiseStandardDeviation(3.19);
+            parms.PolyModulus = "1x^4 + 1";
+            parms.CoeffModulus = (new List<SmallModulus> { 17, 41 });
+            parms.PlainModulus = 18;
+            parms.NoiseStandardDeviation = 3.19;
             {
                 var context = new SEALContext(parms);
                 var qualifiers = context.Qualifiers;
@@ -102,10 +102,10 @@ namespace SEALNETTest
             }
 
             // Parameters OK; fast plain lift
-            parms.SetPolyModulus("1x^4 + 1");
-            parms.SetCoeffModulus(new List<UInt64> { 17, 41 });
-            parms.SetPlainModulus(16);
-            parms.SetNoiseStandardDeviation(3.19);
+            parms.PolyModulus = "1x^4 + 1";
+            parms.CoeffModulus = (new List<SmallModulus> { 17, 41 });
+            parms.PlainModulus = 16;
+            parms.NoiseStandardDeviation = 3.19;
             {
                 var context = new SEALContext(parms);
                 var qualifiers = context.Qualifiers;
@@ -118,10 +118,10 @@ namespace SEALNETTest
             }
 
             // Parameters OK; no batching due to non-prime plain modulus
-            parms.SetPolyModulus("1x^4 + 1");
-            parms.SetCoeffModulus(new List<UInt64> { 17, 41 });
-            parms.SetPlainModulus(49);
-            parms.SetNoiseStandardDeviation(3.19);
+            parms.PolyModulus = "1x^4 + 1";
+            parms.CoeffModulus = (new List<SmallModulus> { 17, 41 });
+            parms.PlainModulus = 49;
+            parms.NoiseStandardDeviation = 3.19;
             {
                 var context = new SEALContext(parms);
                 var qualifiers = context.Qualifiers;
@@ -134,10 +134,10 @@ namespace SEALNETTest
             }
 
             // Parameters OK; batching enabled
-            parms.SetPolyModulus("1x^4 + 1");
-            parms.SetCoeffModulus(new List<UInt64> { 17, 41 });
-            parms.SetPlainModulus(73);
-            parms.SetNoiseStandardDeviation(3.19);
+            parms.PolyModulus = "1x^4 + 1";
+            parms.CoeffModulus = (new List<SmallModulus> { 17, 41 });
+            parms.PlainModulus = 73;
+            parms.NoiseStandardDeviation = 3.19;
             {
                 var context = new SEALContext(parms);
                 var qualifiers = context.Qualifiers;
@@ -150,10 +150,10 @@ namespace SEALNETTest
             }
 
             // Parameters OK; batching and fast plain lift enabled
-            parms.SetPolyModulus("1x^4 + 1");
-            parms.SetCoeffModulus(new List<UInt64> { 137, 193 });
-            parms.SetPlainModulus(73);
-            parms.SetNoiseStandardDeviation(3.19);
+            parms.PolyModulus = "1x^4 + 1";
+            parms.CoeffModulus = (new List<SmallModulus> { 137, 193 });
+            parms.PlainModulus = 73;
+            parms.NoiseStandardDeviation = 3.19;
             {
                 var context = new SEALContext(parms);
                 var qualifiers = context.Qualifiers;
@@ -166,10 +166,10 @@ namespace SEALNETTest
             }
 
             // Negative noise standard deviation
-            parms.SetPolyModulus("1x^4 + 1");
-            parms.SetCoeffModulus(new List<UInt64> { 137, 193 });
-            parms.SetPlainModulus(73);
-            parms.SetNoiseStandardDeviation(-0.1);
+            parms.PolyModulus = "1x^4 + 1";
+            parms.CoeffModulus = (new List<SmallModulus> { 137, 193 });
+            parms.PlainModulus = 73;
+            parms.NoiseStandardDeviation = -0.1;
             {
                 var context = new SEALContext(parms);
                 var qualifiers = context.Qualifiers;

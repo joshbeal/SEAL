@@ -199,7 +199,7 @@ namespace SEALNETExamples
             possible to go beyond this. Since we perform only a very small computation in this 
             example, it suffices to use a very small polynomial modulus.
             */
-            parms.SetPolyModulus("1x^2048 + 1");
+            parms.PolyModulus = "1x^2048 + 1";
 
             /*
             Next we choose the [ciphertext] coefficient modulus (CoeffModulus). The size of 
@@ -258,7 +258,7 @@ namespace SEALNETExamples
             level. Concretely, this coefficient modulus consists of only one 56-bit prime 
             factor: 0xfffffffff00001.
             */
-            parms.SetCoeffModulus(DefaultParams.CoeffModulus128(2048));
+            parms.CoeffModulus = DefaultParams.CoeffModulus128(2048);
 
             /*
             The plaintext modulus can be any positive integer, even though here we take 
@@ -275,7 +275,7 @@ namespace SEALNETExamples
             and the noise budget consumption in a homomorphic multiplication is of the 
             form log2(PlainModulus) + (other terms).
             */
-            parms.SetPlainModulus(1 << 8);
+            parms.PlainModulus = 1 << 8;
 
             /*
             Now that all parameters are set, we are ready to construct a SEALContext 
@@ -493,7 +493,9 @@ namespace SEALNETExamples
             Console.WriteLine($"Decoded integer: {encoder.DecodeInt32(plainResult)}");
 
             /*
-			Run garbage collection to help the global memory pool.
+            We finish by running garbage collection to make sure all local objects are
+            destroyed and memory returned to the memory pool. This is very important to
+            ensure correct behavior of the SEAL memory pool in .NET applications.
             */
             GC.Collect();
         }
@@ -511,7 +513,7 @@ namespace SEALNETExamples
             to do more homomorphic multiplications.
             */
             var parms = new EncryptionParameters();
-            parms.SetPolyModulus("1x^8192 + 1");
+            parms.PolyModulus = "1x^8192 + 1";
 
             /*
             The default coefficient modulus consists of the following primes:
@@ -523,8 +525,8 @@ namespace SEALNETExamples
 
             The total size is 219 bits.
             */
-            parms.SetCoeffModulus(DefaultParams.CoeffModulus128(8192));
-            parms.SetPlainModulus(1 << 10);
+            parms.CoeffModulus = DefaultParams.CoeffModulus128(8192);
+            parms.PlainModulus = 1 << 10;
 
             var context = new SEALContext(parms);
             PrintParameters(context);
@@ -773,7 +775,7 @@ namespace SEALNETExamples
             */
 
             /*
-			Run garbage collection to help the global memory pool.
+            Run garbage collection to help the global memory pool.
             */
             GC.Collect();
         }
@@ -795,9 +797,9 @@ namespace SEALNETExamples
             only two, it suffices to use a small PolyModulus.
             */
             var parms = new EncryptionParameters();
-            parms.SetPolyModulus("1x^2048 + 1");
-            parms.SetCoeffModulus(DefaultParams.CoeffModulus128(2048));
-            parms.SetPlainModulus(1 << 8);
+            parms.PolyModulus = "1x^2048 + 1";
+            parms.CoeffModulus = DefaultParams.CoeffModulus128(2048);
+            parms.PlainModulus = 1 << 8;
 
             var context = new SEALContext(parms);
             PrintParameters(context);
@@ -928,7 +930,7 @@ namespace SEALNETExamples
             Console.WriteLine($"Weighted average: {result}");
 
             /*
-			Run garbage collection to help the global memory pool.
+            Run garbage collection to help the global memory pool.
             */
             GC.Collect();
         }
@@ -1073,7 +1075,7 @@ namespace SEALNETExamples
                 decryptor.InvariantNoiseBudget(deg3Term));
 
             /*
-			Run garbage collection to help the global memory pool.
+            Run garbage collection to help the global memory pool.
             */
             GC.Collect();
         }
@@ -1097,13 +1099,13 @@ namespace SEALNETExamples
             */
             var parms = new EncryptionParameters();
 
-            parms.SetPolyModulus("1x^4096 + 1");
-            parms.SetCoeffModulus(DefaultParams.CoeffModulus128(4096));
+            parms.PolyModulus = "1x^4096 + 1";
+            parms.CoeffModulus = DefaultParams.CoeffModulus128(4096);
 
             /*
             Note that 40961 is a prime number and 2*4096 divides 40960.
             */
-            parms.SetPlainModulus(40961);
+            parms.PlainModulus = 40961;
 
             var context = new SEALContext(parms);
             PrintParameters(context);
@@ -1313,7 +1315,7 @@ namespace SEALNETExamples
             */
 
             /*
-			Run garbage collection to help the global memory pool.
+            Run garbage collection to help the global memory pool.
             */
             GC.Collect();
         }
