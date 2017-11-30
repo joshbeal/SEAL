@@ -1,7 +1,7 @@
 #pragma once
 
 // SEAL version
-#define SEAL_VERSION_STRING "v2.3.0-3-dev"
+#define SEAL_VERSION_STRING "v2.3.0-4"
 
 // For extended parameter checks compile with -DSEAL_DEBUG in GCC
 // or compile in Debug mode in Visual Studio 
