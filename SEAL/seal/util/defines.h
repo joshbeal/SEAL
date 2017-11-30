@@ -1,13 +1,34 @@
 #pragma once
 
+// SEAL version
+#define SEAL_VERSION_STRING "v2.3.0-3-dev"
+
 // For extended parameter checks compile with -DSEAL_DEBUG in GCC
 // or compile in Debug mode in Visual Studio 
 #if defined(_MSC_VER) && defined(_DEBUG)
 #define SEAL_DEBUG
 #endif
 
-// SEAL version
-#define SEAL_VERSION_STRING "v2.3.0-3-dev"
+// SEAL checks input argument compatibility and validity using hashes of
+// the encryption parameters. The validity guarantee is implemented by 
+// restricting (direct) access to ciphertext and key data, and to the 
+// hashes that these objects store. This works well when implementing 
+// high-level applications using SEAL, but sometimes is too rigid for 
+// certain lower level applications. SEAL_EXPOSE_MUTABLE_HASH_BLOCK  
+// exposes functions to manually edit the parameter hashes to make the 
+// parameter compatibility checks pass in cases where they normally 
+// should not pass. Please note that it is extremely easy to break 
+// things by doing this, and the consequences can be unexpected.
+#undef SEAL_EXPOSE_MUTABLE_HASH_BLOCK
+
+// Allow ciphertext data to be directly modified by exposing the
+// functions seal::Ciphertext::mutable_pointer(int) and 
+// seal::Ciphertext::set_zero(int) in the public API. Most users should 
+// have no reason to allow this. Another less extreme and recommended 
+// way of mutating ciphertext data is by allocating memory manually, 
+// and using aliased ciphertexts pointing to the allocated memory, 
+// which can then be mutated freely.
+#undef SEAL_EXPOSE_MUTABLE_CIPHERTEXT
 
 // For security reasons one should never throw when decoding fails due
 // to overflow, but in some cases this might help in diagnosing problems.
