@@ -5,8 +5,7 @@ SEAL is written in C++, and contains .NET wrappers for the public API. SEAL is l
 under the Microsoft Research License Agreement, and is free for research use (see LICENSE.txt).
 
 # Documentation
-A detailed manual for SEAL v2.2 is available [here](https://www.microsoft.com/en-us/research/publication/simple-encrypted-arithmetic-library-seal-v2-2/).
-The manual for SEAL v2.3 will be available shortly.
+A detailed manual for SEAL v2.3.0 is available [here](https://www.microsoft.com/en-us/research/publication/simple-encrypted-arithmetic-library-v2-3-0/).
 
 The code-base contains examples written both in C++ and in C#. These examples are heavily commented, 
 serving as a self-contained short introduction to using the library. In addition, the .h files both 

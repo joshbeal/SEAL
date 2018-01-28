@@ -346,7 +346,8 @@ namespace seal
         */
         inline void release()
         {
-            hash_block_ = { 0 };
+            // C++11 compatibility
+            hash_block_ = { { 0 } };
             size_capacity_ = 2;
             size_ = 2;
             poly_coeff_count_ = 0;
@@ -554,7 +555,9 @@ namespace seal
             }
             resize(size, poly_coeff_count_, coeff_mod_count_, pool_);
         }
-
+#ifdef SEAL_EXPOSE_MUTABLE_CIPHERTEXT
+    public:
+#endif
         inline void set_zero(int poly_index)
         {
             if (poly_index < 0 || poly_index >= size_)
@@ -591,10 +594,15 @@ namespace seal
             }
             return ciphertext_array_.get() + poly_index * poly_uint64_count;
         }
-
+#ifdef SEAL_EXPOSE_MUTABLE_CIPHERTEXT
+    private:
+#endif
+#ifdef SEAL_EXPOSE_MUTABLE_HASH_BLOCK
+    public:
+#endif
         /**
-        Returns a reference to the hash block. The user should never have a reason to 
-        modify the hash block by hand.
+        Returns a reference to the hash block. The user should normally never have
+        a reason to modify the hash block by hand.
 
         @see EncryptionParameters for more information about the hash block.
         */
@@ -602,10 +610,13 @@ namespace seal
         {
             return hash_block_;
         }
-
+#ifdef SEAL_EXPOSE_MUTABLE_HASH_BLOCK
+    private:
+#endif
         MemoryPoolHandle pool_;
 
-        EncryptionParameters::hash_block_type hash_block_{ 0 };
+        // C++11 compatibility
+        EncryptionParameters::hash_block_type hash_block_{ { 0 } };
         
         int size_capacity_ = 2;
 

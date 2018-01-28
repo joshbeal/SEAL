@@ -125,11 +125,12 @@ namespace seal
         Returns whether a Galois key corresponding to a given Galois element exists.
 
         @param[in] galois_elt The Galois element
+        @throw std::invalid_argument if Galois element is not valid
         */
         inline bool has_key(std::uint64_t galois_elt) const
         {
             // Verify parameters
-            if (!(galois_elt & 1) || (galois_elt < 0))
+            if (!(galois_elt & 1))
             {
                 throw std::invalid_argument("galois element is not valid");
             }
@@ -179,10 +180,12 @@ namespace seal
         {
             return keys_;
         }
-
+#ifdef SEAL_EXPOSE_MUTABLE_HASH_BLOCK
+    public:
+#endif
         /**
-        Returns a reference to the hash block. The user should never have a reason to
-        modify the hash block by hand.
+        Returns a reference to the hash block. The user should normally never have
+        a reason to modify the hash block by hand.
 
         @see EncryptionParameters for more information about the hash block.
         */
@@ -190,13 +193,16 @@ namespace seal
         {
             return hash_block_;
         }
-
-        EncryptionParameters::hash_block_type hash_block_{ 0 };
+#ifdef SEAL_EXPOSE_MUTABLE_HASH_BLOCK
+    private:
+#endif
+        // C++11 compatibility
+        EncryptionParameters::hash_block_type hash_block_{ { 0 } };
 
         /**
         The vector of Galois keys.
         */
-        std::vector<std::vector<Ciphertext> >  keys_;
+        std::vector<std::vector<Ciphertext> > keys_;
 
         int decomposition_bit_count_ = 0;
 

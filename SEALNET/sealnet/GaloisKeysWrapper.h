@@ -114,6 +114,7 @@ namespace Microsoft
                 exists.</summary>
 
                 <param name="galoisElt">The Galois element</param>
+                <exception cref="System::ArgumentException">if Galois element is not valid</exception>
                 */
                 bool HasKey(System::UInt64 galoisElt);
 

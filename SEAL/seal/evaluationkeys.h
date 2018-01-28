@@ -173,10 +173,12 @@ namespace seal
         {
             return keys_;
         }
-
+#ifdef SEAL_EXPOSE_MUTABLE_HASH_BLOCK
+    public:
+#endif
         /**
-        Returns a reference to the hash block. The user should never have a reason to
-        modify the hash block by hand.
+        Returns a reference to the hash block. The user should normally never have
+        a reason to modify the hash block by hand.
 
         @see EncryptionParameters for more information about the hash block.
         */
@@ -184,8 +186,11 @@ namespace seal
         {
             return hash_block_;
         }
-
-        EncryptionParameters::hash_block_type hash_block_{ 0 };
+#ifdef SEAL_EXPOSE_MUTABLE_HASH_BLOCK
+    private:
+#endif
+        // C++11 compatibility
+        EncryptionParameters::hash_block_type hash_block_{ { 0 } };
 
         /**
         The vector of evaluation keys.

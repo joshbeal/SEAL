@@ -131,17 +131,6 @@ namespace Microsoft
                 static MemoryPoolHandle ^New(bool threadSafe);
 
                 /**
-                <summary>Deallocates all memory allocated by the global memory pool.</summary>
-
-                <remarks>
-                Deallocates all memory allocated by the global memory pool. This must only be 
-                called to clean up the memory pool after all other SEAL objects have been 
-                disposed.
-                </remarks>
-                */
-                static void ClearGlobalMemoryPool();
-
-                /**
                 <summary>Returns the number of different allocation sizes.</summary>
 
                 <remarks>

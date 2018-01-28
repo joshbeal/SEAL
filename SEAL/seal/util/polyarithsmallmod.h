@@ -12,7 +12,8 @@ namespace seal
 {
     namespace util
     {
-        inline void modulo_poly_coeffs(std::uint64_t *poly, int coeff_count, const SmallModulus &modulus, std::uint64_t *result)
+        inline void modulo_poly_coeffs(const std::uint64_t *poly, int coeff_count, const SmallModulus &modulus, 
+            std::uint64_t *result)
         {
 #ifdef SEAL_DEBUG
             if (poly == nullptr && coeff_count > 0)
@@ -32,13 +33,15 @@ namespace seal
                 throw std::invalid_argument("modulus");
             }
 #endif
+            const std::uint64_t modulus_value = modulus.value();
             for (int i = 0; i < coeff_count; i++)
             {
-                result[i] = poly[i] % modulus.value();
+                *result++ = *poly++ % modulus_value;
             }
         }
 
-        inline void negate_poly_coeffmod(const std::uint64_t *poly, int coeff_count, const SmallModulus &modulus, std::uint64_t *result)
+        inline void negate_poly_coeffmod(const std::uint64_t *poly, int coeff_count, const SmallModulus &modulus,
+            std::uint64_t *result)
         {
 #ifdef SEAL_DEBUG
             if (poly == nullptr && coeff_count > 0)
@@ -58,13 +61,24 @@ namespace seal
                 throw std::invalid_argument("result");
             }
 #endif
+            const uint64_t modulus_value = modulus.value();
             for (int i = 0; i < coeff_count; i++)
             {
-                result[i] = negate_uint_mod(poly[i], modulus);
+                // Explicit inline
+                //*result++ = negate_uint_mod(*poly++, modulus);
+#ifdef SEAL_DEBUG
+                if (*poly >= modulus_value)
+                {
+                    throw std::out_of_range("poly");
+                }
+#endif
+                std::int64_t non_zero = (*poly != 0);
+                *result++ = (modulus_value - *poly++) & static_cast<std::uint64_t>(-non_zero);
             }
         }
 
-        inline void add_poly_poly_coeffmod(const std::uint64_t *operand1, const std::uint64_t *operand2, int coeff_count, const SmallModulus &modulus, std::uint64_t *result)
+        inline void add_poly_poly_coeffmod(const std::uint64_t *operand1, const std::uint64_t *operand2, 
+            int coeff_count, const SmallModulus &modulus, std::uint64_t *result)
         {
 #ifdef SEAL_DEBUG
             if (operand1 == nullptr && coeff_count > 0)
@@ -88,13 +102,28 @@ namespace seal
                 throw std::invalid_argument("result");
             }
 #endif
+            const uint64_t modulus_value = modulus.value();
             for (int i = 0; i < coeff_count; i++)
             {
-                result[i] = add_uint_uint_mod(operand1[i], operand2[i], modulus);
+                // Explicit inline
+                //result[i] = add_uint_uint_mod(operand1[i], operand2[i], modulus);
+#ifdef SEAL_DEBUG
+                if (*operand1 >= modulus_value)
+                {
+                    throw std::out_of_range("operand1");
+                }
+                if (*operand2 >= modulus_value)
+                {
+                    throw std::out_of_range("operand2");
+                }
+#endif
+                std::uint64_t sum = *operand1++ + *operand2++;
+                *result++ = sum - (modulus_value & static_cast<std::uint64_t>(-static_cast<std::int64_t>(sum >= modulus_value)));
             }
         }
 
-        inline void sub_poly_poly_coeffmod(const std::uint64_t *operand1, const std::uint64_t *operand2, int coeff_count, const SmallModulus &modulus, std::uint64_t *result)
+        inline void sub_poly_poly_coeffmod(const std::uint64_t *operand1, const std::uint64_t *operand2, 
+            int coeff_count, const SmallModulus &modulus, std::uint64_t *result)
         {
 #ifdef SEAL_DEBUG
             if (operand1 == nullptr && coeff_count > 0)
@@ -118,13 +147,28 @@ namespace seal
                 throw std::invalid_argument("result");
             }
 #endif
+            const uint64_t modulus_value = modulus.value();
             for (int i = 0; i < coeff_count; i++)
             {
-                result[i] = sub_uint_uint_mod(operand1[i], operand2[i], modulus);
+                // Explicit inline
+                //result[i] = sub_uint_uint_mod(operand1[i], operand2[i], modulus);
+#ifdef SEAL_DEBUG
+                if (*operand1 >= modulus_value)
+                {
+                    throw std::out_of_range("operand1");
+                }
+                if (*operand2 >= modulus_value)
+                {
+                    throw std::out_of_range("operand2");
+                }
+#endif
+                std::int64_t borrow = SEAL_SUB_BORROW_UINT64(*operand1++, *operand2++, 0, result);
+                *result++ += (modulus_value & static_cast<std::uint64_t>(-borrow));
             }
         }
 
-        inline void multiply_poly_scalar_coeffmod(const std::uint64_t *poly, int coeff_count, std::uint64_t scalar, const SmallModulus &modulus, std::uint64_t *result)
+        inline void multiply_poly_scalar_coeffmod(const std::uint64_t *poly, int coeff_count, std::uint64_t scalar,
+            const SmallModulus &modulus, std::uint64_t *result)
         {
 #ifdef SEAL_DEBUG
             if (poly == nullptr && coeff_count > 0)
@@ -144,14 +188,42 @@ namespace seal
                 throw std::invalid_argument("modulus");
             }
 #endif
-#ifdef SEAL_VECTORIZATION_HINTS
-            multiply_uint_scalar_mod_vector(poly, coeff_count, scalar, modulus, result);
-#else
+            // Explicit inline
+            //for (int i = 0; i < coeff_count; i++)
+            //{
+            //    *result++ = multiply_uint_uint_mod(*poly++, scalar, modulus);
+            //}
+            const std::uint64_t modulus_value = modulus.value();
+            const std::uint64_t const_ratio_0 = modulus.const_ratio()[0];
+            const std::uint64_t const_ratio_1 = modulus.const_ratio()[1];
+            std::uint64_t z[2];
+            std::uint64_t tmp1, tmp2[2], tmp3, carry;
             for (int i = 0; i < coeff_count; i++)
             {
-                result[i] = multiply_uint_uint_mod(poly[i], scalar, modulus);
+                multiply_uint64(*poly++, scalar, z);
+            
+                // Reduces z using base 2^64 Barrett reduction
+                
+                // Multiply input and const_ratio
+                // Round 1
+                multiply_uint64_hw64(z[0], const_ratio_0, &carry);
+
+                multiply_uint64(z[0], const_ratio_1, tmp2);
+                tmp3 = tmp2[1] + add_uint64(tmp2[0], carry, 0, &tmp1);
+
+                // Round 2
+                multiply_uint64(z[1], const_ratio_0, tmp2);
+                carry = tmp2[1] + add_uint64(tmp1, tmp2[0], 0, &tmp1);
+
+                // This is all we care about
+                tmp1 = z[1] * const_ratio_1 + tmp3 + carry;
+
+                // Barrett subtraction
+                tmp3 = z[0] - tmp1 * modulus_value;
+
+                // Claim: One more subtraction is enough
+                *result++ = tmp3 - (modulus_value & static_cast<uint64_t>(-static_cast<std::int64_t>(tmp3 >= modulus_value)));
             }
-#endif
         }
 
         inline void multiply_poly_mono_coeffmod(const std::uint64_t *poly, int coeff_count, std::uint64_t mono_coeff, int mono_power, const SmallModulus &modulus, std::uint64_t *result, MemoryPool &pool)
@@ -188,26 +260,32 @@ namespace seal
             set_uint_uint(intermediate.get(), coeff_count, result);
         }
 
-        void multiply_poly_poly_coeffmod(const std::uint64_t *operand1, int operand1_coeff_count, const std::uint64_t *operand2, int operand2_coeff_count,
+        void multiply_poly_poly_coeffmod(const std::uint64_t *operand1, int operand1_coeff_count,
+            const std::uint64_t *operand2, int operand2_coeff_count,
             const SmallModulus &modulus, int result_coeff_count, std::uint64_t *result);
 
-        void multiply_poly_poly_coeffmod(const std::uint64_t *operand1, const std::uint64_t *operand2, int coeff_count, const SmallModulus &modulus, std::uint64_t *result);
+        void multiply_poly_poly_coeffmod(const std::uint64_t *operand1, const std::uint64_t *operand2,
+            int coeff_count, const SmallModulus &modulus, std::uint64_t *result);
 
-        inline void multiply_truncate_poly_poly_coeffmod(const std::uint64_t *operand1, const std::uint64_t *operand2, int coeff_count, const SmallModulus &modulus, std::uint64_t *result)
+        inline void multiply_truncate_poly_poly_coeffmod(const std::uint64_t *operand1, const std::uint64_t *operand2, 
+            int coeff_count, const SmallModulus &modulus, std::uint64_t *result)
         {
             multiply_poly_poly_coeffmod(operand1, coeff_count, operand2, coeff_count, modulus, coeff_count, result);
         }
 
-        void divide_poly_poly_coeffmod_inplace(std::uint64_t *numerator, const std::uint64_t *denominator, int coeff_count, const SmallModulus &modulus, std::uint64_t *quotient, MemoryPool &pool);
+        void divide_poly_poly_coeffmod_inplace(std::uint64_t *numerator, const std::uint64_t *denominator,
+            int coeff_count, const SmallModulus &modulus, std::uint64_t *quotient, MemoryPool &pool);
 
-        inline void divide_poly_poly_coeffmod(const std::uint64_t *numerator, const std::uint64_t *denominator, int coeff_count, const SmallModulus &modulus, std::uint64_t *quotient, std::uint64_t *remainder, MemoryPool &pool)
+        inline void divide_poly_poly_coeffmod(const std::uint64_t *numerator, const std::uint64_t *denominator, 
+            int coeff_count, const SmallModulus &modulus, std::uint64_t *quotient, std::uint64_t *remainder, MemoryPool &pool)
         {
             int coeff_uint64_count = modulus.uint64_count();
             set_poly_poly(numerator, coeff_count, coeff_uint64_count, remainder);
             divide_poly_poly_coeffmod_inplace(remainder, denominator, coeff_count, modulus, quotient, pool);
         }
 
-        inline void add_bigpolyarray_coeffmod(const std::uint64_t *array1, const std::uint64_t *array2, int count, int coeff_count, const SmallModulus &modulus, std::uint64_t *result)
+        inline void add_bigpolyarray_coeffmod(const std::uint64_t *array1, const std::uint64_t *array2, int count,
+            int coeff_count, const SmallModulus &modulus, std::uint64_t *result)
         {
             // Check validity of inputs
 #ifdef SEAL_DEBUG
@@ -250,7 +328,8 @@ namespace seal
             }
         }
 
-        inline void apply_galois(const std::uint64_t *input, int coeff_count_power, std::uint64_t galois_elt, const SmallModulus &modulus, std::uint64_t *result)
+        inline void apply_galois(const std::uint64_t *input, int coeff_count_power, std::uint64_t galois_elt,
+            const SmallModulus &modulus, std::uint64_t *result)
         {
 #ifdef SEAL_DEBUG
             if (input == nullptr)
@@ -270,7 +349,7 @@ namespace seal
                 throw std::invalid_argument("coeff_count_power");
             }
             // Verify coprime conditions.
-            if (!(galois_elt & 1) || galois_elt >= (1ULL << (coeff_count_power + 1)) || (galois_elt < 0))
+            if (!(galois_elt & 1) || galois_elt >= (1ULL << (coeff_count_power + 1)))
             {
                 throw std::invalid_argument("galois element is not valid");
             }
@@ -279,22 +358,26 @@ namespace seal
                 throw std::invalid_argument("modulus");
             }
 #endif
-            std::uint64_t coeff_count = 1ULL << coeff_count_power;
-            for (std::uint64_t i = 0; i < coeff_count; i++)
+            const std::uint64_t modulus_value = modulus.value();
+            std::uint64_t coeff_count_minus_one = (1ULL << coeff_count_power) - 1;
+            for (std::uint64_t i = 0; i <= coeff_count_minus_one; i++)
             {
                 std::uint64_t index_raw = i * galois_elt;
-                std::uint64_t index = index_raw & (coeff_count - 1);
-                std::uint64_t multiples = index_raw >> coeff_count_power;
-
-                result[index] = input[i];
-                if (multiples & 1)
+                std::uint64_t index = index_raw & coeff_count_minus_one;
+                std::uint64_t result_value = *input++;
+                if ((index_raw >> coeff_count_power) & 1)
                 {
-                    result[index] = negate_uint_mod(result[index], modulus);
+                    // Explicit inline
+                    //result[index] = negate_uint_mod(result[index], modulus);
+                    std::int64_t non_zero = (result_value != 0);
+                    result_value = (modulus_value - result_value) & static_cast<std::uint64_t>(-non_zero);
                 }
+                result[index] = result_value;
             }
         }
 
-        inline void apply_galois_ntt(const std::uint64_t *input, int coeff_count_power, std::uint64_t galois_elt, std::uint64_t *result)
+        inline void apply_galois_ntt(const std::uint64_t *input, int coeff_count_power, std::uint64_t galois_elt,
+            std::uint64_t *result)
         {
 #ifdef SEAL_DEBUG
             if (input == nullptr)
@@ -314,24 +397,25 @@ namespace seal
                 throw std::invalid_argument("coeff_count_power");
             }
             // Verify coprime conditions.
-            if (!(galois_elt & 1) || galois_elt >= (1ULL << (coeff_count_power + 1)) || (galois_elt < 0))
+            if (!(galois_elt & 1) || galois_elt >= (1ULL << (coeff_count_power + 1)))
             {
                 throw std::invalid_argument("galois element is not valid");
             }
 #endif
             std::uint32_t coeff_count = 1U << coeff_count_power;
-            std::uint32_t m = 2 * coeff_count;
+            std::uint32_t m_minus_one = 2 * coeff_count;
             for (std::uint32_t i = 0; i < coeff_count; i++)
             {
                 std::uint32_t reversed = reverse_bits(i, coeff_count_power);
                 std::uint64_t index_raw = galois_elt * (2 * reversed + 1);
-                index_raw &= (m - 1);
+                index_raw &= m_minus_one;
                 std::uint32_t index = reverse_bits((static_cast<std::uint32_t>(index_raw) - 1) >> 1, coeff_count_power);
                 result[i] = input[index];
             }
         }
 
-        inline void dyadic_product_coeffmod(const std::uint64_t *operand1, const std::uint64_t *operand2, int coeff_count, const SmallModulus &modulus, std::uint64_t *result)
+        inline void dyadic_product_coeffmod(const std::uint64_t *operand1, const std::uint64_t *operand2, 
+            int coeff_count, const SmallModulus &modulus, std::uint64_t *result)
         {
 #ifdef SEAL_DEBUG
             if (operand1 == nullptr)
@@ -355,19 +439,49 @@ namespace seal
                 throw std::invalid_argument("modulus");
             }
 #endif
-#ifdef SEAL_VECTORIZATION_HINTS
-            multiply_uint_uint_mod_vector(operand1, operand2, coeff_count, modulus, result);
-#else
+            // Explicit inline
+            //for (int i = 0; i < coeff_count; i++)
+            //{
+            //    *result++ = multiply_uint_uint_mod(*operand1++, *operand2++, modulus);
+            //}
+            const std::uint64_t modulus_value = modulus.value();
+            const std::uint64_t const_ratio_0 = modulus.const_ratio()[0];
+            const std::uint64_t const_ratio_1 = modulus.const_ratio()[1];
             for (int i = 0; i < coeff_count; i++)
             {
-                *result++ = multiply_uint_uint_mod(*operand1++, *operand2++, modulus);
+                std::uint64_t z[2];
+                multiply_uint64(*operand1++, *operand2++, z);
+
+                // Reduces z using base 2^64 Barrett reduction
+                std::uint64_t tmp1, tmp2[2], tmp3, carry;
+
+                // Multiply input and const_ratio
+                // Round 1
+                multiply_uint64_hw64(z[0], const_ratio_0, &carry);
+
+                multiply_uint64(z[0], const_ratio_1, tmp2);
+                tmp3 = tmp2[1] + add_uint64(tmp2[0], carry, 0, &tmp1);
+
+                // Round 2
+                multiply_uint64(z[1], const_ratio_0, tmp2);
+                carry = tmp2[1] + add_uint64(tmp1, tmp2[0], 0, &tmp1);
+
+                // This is all we care about
+                tmp1 = z[1] * const_ratio_1 + tmp3 + carry;
+
+                // Barrett subtraction
+                tmp3 = z[0] - tmp1 * modulus_value;
+
+                // Claim: One more subtraction is enough
+                *result++ = tmp3 - (modulus_value & static_cast<uint64_t>(-static_cast<std::int64_t>(tmp3 >= modulus_value)));
             }
-#endif
         }
 
-        void modulo_poly_inplace(std::uint64_t *value, int value_coeff_count, const PolyModulus &poly_modulus, const SmallModulus &modulus);
+        void modulo_poly_inplace(std::uint64_t *value, int value_coeff_count, const PolyModulus &poly_modulus,
+            const SmallModulus &modulus);
 
-        inline void modulo_poly(const std::uint64_t *value, int value_coeff_count, const PolyModulus &poly_modulus, const SmallModulus &modulus, std::uint64_t *result, MemoryPool &pool)
+        inline void modulo_poly(const std::uint64_t *value, int value_coeff_count, const PolyModulus &poly_modulus,
+            const SmallModulus &modulus, std::uint64_t *result, MemoryPool &pool)
         {
 #ifdef SEAL_DEBUG
             if (value == nullptr)
@@ -394,7 +508,9 @@ namespace seal
             set_poly_poly(value_copy.get(), poly_modulus.coeff_count(), coeff_uint64_count, result);
         }
 
-        inline void nonfft_multiply_poly_poly_polymod_coeffmod(const std::uint64_t *operand1, const std::uint64_t *operand2, const PolyModulus &poly_modulus, const SmallModulus &modulus, std::uint64_t *result, MemoryPool &pool)
+        inline void nonfft_multiply_poly_poly_polymod_coeffmod(const std::uint64_t *operand1, 
+            const std::uint64_t *operand2, const PolyModulus &poly_modulus, const SmallModulus &modulus, 
+            std::uint64_t *result, MemoryPool &pool)
         {
 #ifdef SEAL_DEBUG
             if (operand1 == nullptr)
@@ -435,7 +551,9 @@ namespace seal
             set_uint_uint(intermediate.get(), coeff_count, result);
         }
 
-        inline void nonfft_multiply_poly_poly_polymod_coeffmod_inplace(const std::uint64_t *operand1, const std::uint64_t *operand2, const PolyModulus &poly_modulus, const SmallModulus &modulus, std::uint64_t *result)
+        inline void nonfft_multiply_poly_poly_polymod_coeffmod_inplace(const std::uint64_t *operand1,
+            const std::uint64_t *operand2, const PolyModulus &poly_modulus, const SmallModulus &modulus,
+            std::uint64_t *result)
         {
 #ifdef SEAL_DEBUG
             if (operand1 == nullptr)
@@ -472,11 +590,14 @@ namespace seal
             modulo_poly_inplace(result, result_coeff_count, poly_modulus, modulus);
         }
 
-        std::uint64_t poly_infty_norm_coeffmod(const std::uint64_t *poly, int poly_coeff_count, const SmallModulus &modulus);
+        std::uint64_t poly_infty_norm_coeffmod(const std::uint64_t *poly, int poly_coeff_count,
+            const SmallModulus &modulus);
 
-        bool try_invert_poly_coeffmod(const std::uint64_t *operand, const std::uint64_t *poly_modulus, int coeff_count, const SmallModulus &modulus, std::uint64_t *result, MemoryPool &pool);
+        bool try_invert_poly_coeffmod(const std::uint64_t *operand, const std::uint64_t *poly_modulus, 
+            int coeff_count, const SmallModulus &modulus, std::uint64_t *result, MemoryPool &pool);
 
-        void exponentiate_poly_polymod_coeffmod(const std::uint64_t *poly, const std::uint64_t *exponent, int exponent_uint64_count,
-            const PolyModulus &poly_modulus, const SmallModulus &modulus, std::uint64_t *result, MemoryPool &pool);
+        void exponentiate_poly_polymod_coeffmod(const std::uint64_t *poly, const std::uint64_t *exponent,
+            int exponent_uint64_count, const PolyModulus &poly_modulus, const SmallModulus &modulus, 
+            std::uint64_t *result, MemoryPool &pool);
     }
 }

@@ -13,10 +13,10 @@ namespace SEALNETTest
         {
             var parms = new EncryptionParameters();
 
-            parms.SetPolyModulus("1x^2 + 1");
-            parms.SetCoeffModulus(new List<UInt64> { 2 });
-            parms.SetPlainModulus(2);
-            parms.SetNoiseStandardDeviation(1.0);
+            parms.PolyModulus = "1x^2 + 1";
+            parms.CoeffModulus = new List<SmallModulus> { 2 };
+            parms.PlainModulus = 2;
+            parms.NoiseStandardDeviation = 1.0;
 
             var ctxt = new Ciphertext(parms);
             ctxt.Reserve(10);
@@ -55,10 +55,10 @@ namespace SEALNETTest
         {
             var stream = new MemoryStream();
             var parms = new EncryptionParameters();
-            parms.SetPolyModulus("1x^2 + 1");
-            parms.SetCoeffModulus(new List<UInt64> { 2 });
-            parms.SetPlainModulus(2);
-            parms.SetNoiseStandardDeviation(1.0);
+            parms.PolyModulus = "1x^2 + 1";
+            parms.CoeffModulus = new List<SmallModulus> { 2 };
+            parms.PlainModulus = 2;
+            parms.NoiseStandardDeviation = 1.0;
 
             var ctxt = new Ciphertext(parms);
             var ctxt2 = new Ciphertext();

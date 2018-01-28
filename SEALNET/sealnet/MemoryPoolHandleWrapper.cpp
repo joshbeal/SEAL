@@ -148,20 +148,6 @@ namespace Microsoft
                 throw gcnew Exception("Unexpected exception");
             }
 
-            void MemoryPoolHandle::ClearGlobalMemoryPool()
-            {
-                // Make sure there is nothing to collect and everything has been returned
-                // to the native memory pool.
-                GC::Collect();
-
-                // Release old memory pool
-                const_pointer_cast<seal::util::MemoryPool>(seal::util::global_variables::global_memory_pool).reset();
-
-                // Create a new one
-                const_pointer_cast<seal::util::MemoryPool>(seal::util::global_variables::global_memory_pool)
-                    = std::make_shared<seal::util::MemoryPoolMT>();
-            }
-
             UInt64 MemoryPoolHandle::PoolCount::get()
             {
                 if (handle_ == nullptr)

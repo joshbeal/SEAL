@@ -1479,6 +1479,11 @@ namespace Microsoft
                     HandleException(nullptr);
                 }
             }
+
+            BigUInt::operator BigUInt ^(String ^hexString)
+            {
+                return gcnew BigUInt(hexString);
+            }
         }
     }
 }

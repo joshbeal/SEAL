@@ -17,9 +17,9 @@ namespace SEALTest
             MemoryPoolHandle pool;
             Assert::IsFalse(pool);
             pool = MemoryPoolHandle::Global();
-            Assert::IsTrue(&static_cast<MemoryPool&>(pool) == global_variables::global_memory_pool.get());
+            Assert::IsTrue(&static_cast<MemoryPool&>(pool) == global_variables::global_memory_pool);
             pool = MemoryPoolHandle::New(true);
-            Assert::IsFalse(&pool.operator seal::util::MemoryPool &() == global_variables::global_memory_pool.get());
+            Assert::IsFalse(&pool.operator seal::util::MemoryPool &() == global_variables::global_memory_pool);
             MemoryPoolHandle pool2 = MemoryPoolHandle::New(true);
             Assert::IsFalse(pool == pool2);
 

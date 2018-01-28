@@ -73,7 +73,7 @@ namespace seal
                 return scaled_root_powers_[index];
             }
 
-            inline const std::uint64_t get_from_inv_root_powers(int index) const
+            inline std::uint64_t get_from_inv_root_powers(int index) const
             {
 #ifdef SEAL_DEBUG
                 if (index >= coeff_count_)

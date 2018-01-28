@@ -113,7 +113,10 @@ namespace seal
         */
         inline static MemoryPoolHandle Global()
         {
-            return MemoryPoolHandle(util::global_variables::global_memory_pool);
+            // We return an aliased shared_ptr; a hack necessary due to C++/CLI complications
+            // with global shared_ptr.
+            return MemoryPoolHandle(std::shared_ptr<util::MemoryPool>(std::shared_ptr<util::MemoryPool>(), 
+                util::global_variables::global_memory_pool));
         }
 
         /**
@@ -229,7 +232,7 @@ namespace seal
 
     private:
         MemoryPoolHandle(std::shared_ptr<util::MemoryPool> pool) noexcept : 
-            pool_(pool)
+            pool_(std::move(pool))
         {
         }
 

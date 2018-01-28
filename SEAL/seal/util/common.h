@@ -9,25 +9,25 @@ namespace seal
 {
     namespace util
     {
-        const int bytes_per_uint64 = sizeof(std::uint64_t);
+        constexpr int bytes_per_uint64 = sizeof(std::uint64_t);
 
-        const int bytes_per_uint32 = sizeof(std::uint32_t);
+        constexpr int bytes_per_uint32 = sizeof(std::uint32_t);
 
-        const int uint32_per_uint64 = 2;
+        constexpr int uint32_per_uint64 = 2;
 
-        const int bits_per_nibble = 4;
+        constexpr int bits_per_nibble = 4;
 
-        const int bits_per_byte = 8;
+        constexpr int bits_per_byte = 8;
 
-        const int bits_per_uint64 = bytes_per_uint64 * bits_per_byte;
+        constexpr int bits_per_uint64 = bytes_per_uint64 * bits_per_byte;
 
-        const int bits_per_uint32 = bytes_per_uint32 * bits_per_byte;
+        constexpr int bits_per_uint32 = bytes_per_uint32 * bits_per_byte;
 
-        const int nibbles_per_byte = 2;
+        constexpr int nibbles_per_byte = 2;
 
-        const int nibbles_per_uint64 = bytes_per_uint64 * nibbles_per_byte;
+        constexpr int nibbles_per_uint64 = bytes_per_uint64 * nibbles_per_byte;
 
-        const std::uint64_t uint64_high_bit = 1ULL << (bits_per_uint64 - 1);
+        constexpr std::uint64_t uint64_high_bit = 1ULL << (bits_per_uint64 - 1);
 
         inline std::uint32_t reverse_bits(std::uint32_t operand)
         {

@@ -195,7 +195,7 @@ namespace seal
         Pointer tmp_dest_plain_gamma(allocate_poly(coeff_count, plain_gamma_uint64_count, pool));
 
         // Compute FastBConvert from q to {gamma, plain_modulus}
-        base_converter_.fastbconv_plain_gamma(tmp_dest_modq.get(), tmp_dest_plain_gamma.get());
+        base_converter_.fastbconv_plain_gamma(tmp_dest_modq.get(), tmp_dest_plain_gamma.get(), pool);
         
         // Compute result multiply by coeff_modulus inverse in mod {gamma U plain_modulus}
         for (int i = 0; i < plain_gamma_uint64_count; i++)
@@ -331,7 +331,6 @@ namespace seal
         Pointer temp(allocate_uint(coeff_mod_count, pool_));
         set_zero_uint(total_uint64_count, value);
 
-        uint64_t* value_ptr = value;
         for (int i = 0; i < coeff_count; i++)
         {
             for (int j = 0; j < coeff_mod_count; j++)

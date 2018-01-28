@@ -9,7 +9,7 @@ namespace seal
     {
         namespace global_variables
         {
-            const shared_ptr<MemoryPool> global_memory_pool(make_shared<MemoryPoolMT>());
+            MemoryPool *const global_memory_pool(new MemoryPoolMT);
 
             const double noise_distribution_width_multiplier = 6;
 

@@ -15,8 +15,7 @@ namespace seal
 
         namespace global_variables
         {
-            // The global memory pool must be initialized before other global objects
-            extern const std::shared_ptr<MemoryPool> global_memory_pool;
+            extern MemoryPool *const global_memory_pool;
 
             extern const double noise_distribution_width_multiplier;
 

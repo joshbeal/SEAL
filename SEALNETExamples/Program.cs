@@ -77,34 +77,8 @@ namespace SEALNETExamples
             Console.WriteLine("");
         }
 
-        private static void SEALMemoryPoolCleanUp(Object sender, EventArgs e)
-        {
-            /*
-            The function MemoryPoolHandle.ClearGlobalMemoryPool() should be called before 
-            process exit to release all memory allocated by the global SEAL memory pool.
-            */
-            Console.Write("\nReleasing {0} MB from global memory pool: ",
-                    MemoryPoolHandle.Global().AllocByteCount >> 20);
-            MemoryPoolHandle.ClearGlobalMemoryPool();
-            Console.WriteLine("Done");
-
-            /*
-            Give it enough time to finish up.
-            */
-            System.Threading.Thread.Sleep(4000);
-
-        }
-
         public static void Main()
         {
-            /*
-            It is critically important to deallocate the global memory pool of the
-            C++ library before exiting the managed application. This can be done by
-            calling the function MemoryPoolHandle.DestroyGlobalMemoryPool() at process
-            exit through a new event handler (see above).
-            */
-            AppDomain.CurrentDomain.ProcessExit += new EventHandler(SEALMemoryPoolCleanUp);
-
             while (true)
             {
                 Console.WriteLine("\nSEAL Examples:\n");
@@ -152,7 +126,6 @@ namespace SEALNETExamples
 
                     case 5:
                         ExampleParameterSelection();
-
                         break;
 
                     case 0:
@@ -226,7 +199,7 @@ namespace SEALNETExamples
             possible to go beyond this. Since we perform only a very small computation in this 
             example, it suffices to use a very small polynomial modulus.
             */
-            parms.SetPolyModulus("1x^2048 + 1");
+            parms.PolyModulus = "1x^2048 + 1";
 
             /*
             Next we choose the [ciphertext] coefficient modulus (CoeffModulus). The size of 
@@ -285,7 +258,7 @@ namespace SEALNETExamples
             level. Concretely, this coefficient modulus consists of only one 56-bit prime 
             factor: 0xfffffffff00001.
             */
-            parms.SetCoeffModulus(DefaultParams.CoeffModulus128(2048));
+            parms.CoeffModulus = DefaultParams.CoeffModulus128(2048);
 
             /*
             The plaintext modulus can be any positive integer, even though here we take 
@@ -302,7 +275,7 @@ namespace SEALNETExamples
             and the noise budget consumption in a homomorphic multiplication is of the 
             form log2(PlainModulus) + (other terms).
             */
-            parms.SetPlainModulus(1 << 8);
+            parms.PlainModulus = 1 << 8;
 
             /*
             Now that all parameters are set, we are ready to construct a SEALContext 
@@ -540,7 +513,7 @@ namespace SEALNETExamples
             to do more homomorphic multiplications.
             */
             var parms = new EncryptionParameters();
-            parms.SetPolyModulus("1x^8192 + 1");
+            parms.PolyModulus = "1x^8192 + 1";
 
             /*
             The default coefficient modulus consists of the following primes:
@@ -552,8 +525,8 @@ namespace SEALNETExamples
 
             The total size is 219 bits.
             */
-            parms.SetCoeffModulus(DefaultParams.CoeffModulus128(8192));
-            parms.SetPlainModulus(1 << 10);
+            parms.CoeffModulus = DefaultParams.CoeffModulus128(8192);
+            parms.PlainModulus = 1 << 10;
 
             var context = new SEALContext(parms);
             PrintParameters(context);
@@ -802,9 +775,7 @@ namespace SEALNETExamples
             */
 
             /*
-            We finish by running garbage collection to make sure all local objects are
-            destroyed and memory returned to the memory pool. This is very important to
-            ensure correct behavior of the SEAL memory pool in .NET applications.
+            Run garbage collection to help the global memory pool.
             */
             GC.Collect();
         }
@@ -826,9 +797,9 @@ namespace SEALNETExamples
             only two, it suffices to use a small PolyModulus.
             */
             var parms = new EncryptionParameters();
-            parms.SetPolyModulus("1x^2048 + 1");
-            parms.SetCoeffModulus(DefaultParams.CoeffModulus128(2048));
-            parms.SetPlainModulus(1 << 8);
+            parms.PolyModulus = "1x^2048 + 1";
+            parms.CoeffModulus = DefaultParams.CoeffModulus128(2048);
+            parms.PlainModulus = 1 << 8;
 
             var context = new SEALContext(parms);
             PrintParameters(context);
@@ -959,9 +930,7 @@ namespace SEALNETExamples
             Console.WriteLine($"Weighted average: {result}");
 
             /*
-            We finish by running garbage collection to make sure all local objects are
-            destroyed and memory returned to the memory pool. This is very important to
-            ensure correct behavior of the SEAL memory pool in .NET applications.
+            Run garbage collection to help the global memory pool.
             */
             GC.Collect();
         }
@@ -1106,9 +1075,7 @@ namespace SEALNETExamples
                 decryptor.InvariantNoiseBudget(deg3Term));
 
             /*
-            We finish by running garbage collection to make sure all local objects are
-            destroyed and memory returned to the memory pool. This is very important to
-            ensure correct behavior of the SEAL memory pool in .NET applications.
+            Run garbage collection to help the global memory pool.
             */
             GC.Collect();
         }
@@ -1132,13 +1099,13 @@ namespace SEALNETExamples
             */
             var parms = new EncryptionParameters();
 
-            parms.SetPolyModulus("1x^4096 + 1");
-            parms.SetCoeffModulus(DefaultParams.CoeffModulus128(4096));
+            parms.PolyModulus = "1x^4096 + 1";
+            parms.CoeffModulus = DefaultParams.CoeffModulus128(4096);
 
             /*
             Note that 40961 is a prime number and 2*4096 divides 40960.
             */
-            parms.SetPlainModulus(40961);
+            parms.PlainModulus = 40961;
 
             var context = new SEALContext(parms);
             PrintParameters(context);
@@ -1348,9 +1315,7 @@ namespace SEALNETExamples
             */
 
             /*
-            We finish by running garbage collection to make sure all local objects are
-            destroyed and memory returned to the memory pool. This is very important to
-            ensure correct behavior of the SEAL memory pool in .NET applications.
+            Run garbage collection to help the global memory pool.
             */
             GC.Collect();
         }

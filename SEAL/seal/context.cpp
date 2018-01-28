@@ -162,7 +162,7 @@ namespace seal
     }
 
     SEALContext::SEALContext(const EncryptionParameters &parms, const MemoryPoolHandle &pool) :
-        pool_(pool), parms_(parms), plain_ntt_tables_(pool_), base_converter_(pool_)
+        pool_(pool), parms_(parms), base_converter_(pool_), plain_ntt_tables_(pool_) 
     {
         if (!pool)
         {

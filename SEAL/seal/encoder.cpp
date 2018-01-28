@@ -65,7 +65,6 @@ namespace seal
         {
             uint64_t pos_value = static_cast<uint64_t>(-value);
             int encode_coeff_count = get_significant_bit_count(pos_value);
-            int encode_coeff_bit_count = get_significant_bit_count(neg_one_);
             destination.resize(encode_coeff_count);
             destination.set_zero();
 
@@ -746,7 +745,6 @@ namespace seal
     void BalancedEncoder::decode_biguint(const Plaintext &plain, BigUInt &destination)
     {
         // Determine plain_modulus width.
-        int plain_modulus_bits = plain_modulus_.bit_count();
         uint64_t pos_value;
 
         // Determine coefficient threshold for negative numbers.

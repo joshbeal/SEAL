@@ -114,19 +114,40 @@ namespace Microsoft
                 <remarks>
                 Creates a SEAL plaintext from a given matrix. This function "batches" a given matrix
                 of integers modulo the plaintext modulus into a SEAL plaintext element, and stores
-                the result in the destination parameter. The input System::List must have size equal 
-                to the degree of the polynomial modulus. The first half of the elements represent the
-                first row of the matrix, and the second half represent the second row. The numbers
+                the result in the destination parameter. The input System::List must have size at most 
+                equal to the degree of the polynomial modulus. The first half of the elements represent
+                the first row of the matrix, and the second half represent the second row. The numbers
                 in the matrix can be at most equal to the plaintext modulus for it to represent
                 a valid SEAL plaintext.
                 </remarks>
                 <param name="values">The matrix of integers modulo plaintext modulus to batch</param>
                 <param name="destination">The plaintext polynomial to overwrite with the result</param>
-                <exception cref="System::ArgumentException">if values has incorrect size</exception>
+                <exception cref="System::ArgumentException">if values is too large</exception>
                 <exception cref="System::ArgumentNullException">if values or destination is 
                 null</exception>
                 */
                 void Compose(System::Collections::Generic::List<System::UInt64> ^values, 
+                    Plaintext ^destination);
+
+                /**
+                <summary>Creates a SEAL plaintext from a given matrix.</summary>
+
+                <remarks>
+                Creates a SEAL plaintext from a given matrix. This function "batches" a given matrix
+                of integers modulo the plaintext modulus into a SEAL plaintext element, and stores
+                the result in the destination parameter. The input System::List must have size at most
+                equal to the degree of the polynomial modulus. The first half of the elements represent
+                the first row of the matrix, and the second half represent the second row. The numbers
+                in the matrix can be at most equal to the plaintext modulus for it to represent
+                a valid SEAL plaintext.
+                </remarks>
+                <param name="values">The matrix of integers modulo plaintext modulus to batch</param>
+                <param name="destination">The plaintext polynomial to overwrite with the result</param>
+                <exception cref="System::ArgumentException">if values is too large</exception>
+                <exception cref="System::ArgumentNullException">if values or destination is
+                null</exception>
+                */
+                void Compose(System::Collections::Generic::List<System::Int64> ^values,
                     Plaintext ^destination);
 
                 /**
@@ -203,6 +224,28 @@ namespace Microsoft
                 of integers modulo the plaintext modulus, and stores the result in the destination
                 parameter. The input plaintext must have degress less than the polynomial modulus,
                 and coefficients less than the plaintext modulus, i.e. it must be a valid plaintext
+                for the encryption parameters. Dynamic memory allocations in the process are
+                allocated from the global memory pool.
+                </remarks>
+                <param name="plain">The plaintext polynomial to unbatch</param>
+                <param name="destination">The vector to be overwritten with the values of the
+                slots</param>
+                <exception cref="System::ArgumentException">if plain is not valid for the encryption
+                parameters</exception>
+                <exception cref="System::ArgumentNullException">if values or destination is
+                null</exception>
+                */
+                void Decompose(Plaintext ^plain,
+                    System::Collections::Generic::List<System::Int64> ^destination);
+
+                /**
+                <summary>Inverse of compose.</summary>
+
+                <remarks>
+                Inverse of compose. This function "unbatches" a given SEAL plaintext into a matrix
+                of integers modulo the plaintext modulus, and stores the result in the destination
+                parameter. The input plaintext must have degress less than the polynomial modulus,
+                and coefficients less than the plaintext modulus, i.e. it must be a valid plaintext
                 for the encryption parameters. Dynamic memory allocations in the process are allocated 
                 from the memory pool pointed to by the given <see cref="MemoryPoolHandle" />.
                 </remarks>
@@ -218,6 +261,31 @@ namespace Microsoft
                 */
                 void Decompose(Plaintext ^plain, 
                     System::Collections::Generic::List<System::UInt64> ^destination,
+                    MemoryPoolHandle ^pool);
+
+                /**
+                <summary>Inverse of compose.</summary>
+
+                <remarks>
+                Inverse of compose. This function "unbatches" a given SEAL plaintext into a matrix
+                of integers modulo the plaintext modulus, and stores the result in the destination
+                parameter. The input plaintext must have degress less than the polynomial modulus,
+                and coefficients less than the plaintext modulus, i.e. it must be a valid plaintext
+                for the encryption parameters. Dynamic memory allocations in the process are allocated
+                from the memory pool pointed to by the given <see cref="MemoryPoolHandle" />.
+                </remarks>
+                <param name="plain">The plaintext polynomial to unbatch</param>
+                <param name="destination">The vector to be overwritten with the values of the
+                slots</param>
+                <param name="pool">The MemoryPoolHandle pointing to a valid memory pool</param>
+                <exception cref="System::ArgumentException">if plain is not valid for the encryption
+                parameters</exception>
+                <exception cref="System::ArgumentException">if pool is uninitialized</exception>
+                <exception cref="System::ArgumentNullException">if values. destination, or pool is
+                null</exception>
+                */
+                void Decompose(Plaintext ^plain,
+                    System::Collections::Generic::List<System::Int64> ^destination,
                     MemoryPoolHandle ^pool);
 
                 /**
@@ -252,11 +320,9 @@ namespace Microsoft
                 the local <see cref="MemoryPoolHandle" />.
                 </remarks>
                 <param name="plain">The matrix of integers modulo plaintext modulus to batch</param>
-                <param name="pool">The MemoryPoolHandle pointing to a valid memory pool</param>
                 <exception cref="System::ArgumentException">if plain is not valid for the encryption
                 parameters</exception>
-                <exception cref="System::ArgumentException">if pool is uninitialized</exception>
-                <exception cref="System::ArgumentNullException">if plain or pool is null</exception>
+                <exception cref="System::ArgumentNullException">if plain is null</exception>
                 */
                 void Decompose(Plaintext ^plain);
 

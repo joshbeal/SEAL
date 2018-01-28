@@ -37,7 +37,9 @@ namespace seal
             bit_count_ = 0;
             uint64_count_ = 1;
             value_ = 0;
-            const_ratio_ = { 0 };
+
+            // C++11 compatibility
+            const_ratio_ = { { 0 } };
         }
         else if (value >> 62 != 0 || value == 0x4000000000000000 || value == 1)
         {

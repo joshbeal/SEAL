@@ -53,7 +53,6 @@ namespace seal
             // Clear product.
             set_zero_uint(result_coeff_count, result);
 
-            const uint64_t *modulusptr = modulus.pointer();
             operand1_coeff_count = get_significant_coeff_count_poly(operand1, operand1_coeff_count, 1);
             operand2_coeff_count = get_significant_coeff_count_poly(operand2, operand2_coeff_count, 1);
             for (int operand1_index = 0; operand1_index < operand1_coeff_count; operand1_index++)
@@ -210,11 +209,7 @@ namespace seal
             uint64_t *temp_quotient = monic_denominator_scalar + coeff_uint64_count;
             uint64_t *subtrahend = temp_quotient + intermediate_uint64_count;
 
-            // We still have 7 x coeff_uint64_count of memory left in the big allocation
-            uint64_t *alloc_ptr = subtrahend + intermediate_uint64_count;
-
             // Determine scalar necessary to make denominator monic.
-            const uint64_t *modulusptr = modulus.pointer();
             const uint64_t *leading_denominator_coeff = get_poly_coeff(denominator, denominator_coeffs - 1, coeff_uint64_count);
             if (!try_invert_uint_mod(*leading_denominator_coeff, modulus, *monic_denominator_scalar))
             {
@@ -508,7 +503,6 @@ namespace seal
             uint64_t *invert_next = invert_next_anchor.get();
 
             // Perform extended Euclidean algorithm.
-            const uint64_t *modulusptr = modulus.pointer();
             while (true)
             {
                 // NOTE: degree(numerator) >= degree(denominator).

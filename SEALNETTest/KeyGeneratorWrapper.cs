@@ -12,10 +12,10 @@ namespace SEALNETTest
         {
             var parms = new EncryptionParameters();
             {
-                parms.SetNoiseStandardDeviation(3.19);
-                parms.SetPolyModulus("1x^64 + 1");
-                parms.SetCoeffModulus(new List<SmallModulus> { DefaultParams.SmallMods60Bit(0) });
-                parms.SetPlainModulus(1 << 6);
+                parms.NoiseStandardDeviation = 3.19;
+                parms.PolyModulus = "1x^64 + 1";
+                parms.CoeffModulus = new List<SmallModulus> { DefaultParams.SmallMods60Bit(0) };
+                parms.PlainModulus = 1 << 6;
 
                 var context = new SEALContext(parms);
                 var keygen = new KeyGenerator(context);
@@ -37,12 +37,11 @@ namespace SEALNETTest
                 Assert.AreEqual(60, evk.Key(2)[0].Size);
             }
             {
-                parms.SetNoiseStandardDeviation(3.19);
-                parms.SetPolyModulus("1x^256 + 1");
-                parms.SetCoeffModulus(new List<SmallModulus> {
-                    DefaultParams.SmallMods60Bit(0), DefaultParams.SmallMods30Bit(0), DefaultParams.SmallMods30Bit(1)
-                });
-                parms.SetPlainModulus(1 << 6);
+                parms.NoiseStandardDeviation = 3.19;
+                parms.PolyModulus = "1x^256 + 1";
+                parms.CoeffModulus = new List<SmallModulus> {
+                    DefaultParams.SmallMods60Bit(0), DefaultParams.SmallMods30Bit(0), DefaultParams.SmallMods30Bit(1) };
+                parms.PlainModulus = 1 << 6;
 
                 var context = new SEALContext(parms);
                 var keygen = new KeyGenerator(context);

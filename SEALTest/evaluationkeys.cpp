@@ -28,17 +28,21 @@ namespace SEALTest
 
                 EvaluationKeys keys;
                 EvaluationKeys test_keys;
+                Assert::AreEqual(keys.decomposition_bit_count(), 0);
                 keys.save(stream);
                 test_keys.load(stream);
                 Assert::AreEqual(keys.size(), test_keys.size());
                 Assert::IsTrue(keys.hash_block() == test_keys.hash_block());
+                Assert::AreEqual(keys.decomposition_bit_count(), test_keys.decomposition_bit_count());
                 Assert::AreEqual(0, keys.size());
 
                 keygen.generate_evaluation_keys(1, 1, keys);
+                Assert::AreEqual(keys.decomposition_bit_count(), 1);
                 keys.save(stream);
                 test_keys.load(stream);
                 Assert::AreEqual(keys.size(), test_keys.size());
                 Assert::IsTrue(keys.hash_block() == test_keys.hash_block());
+                Assert::AreEqual(keys.decomposition_bit_count(), test_keys.decomposition_bit_count());
                 for (int j = 0; j < test_keys.size(); j++)
                 {
                     for (int i = 0; i < test_keys.key(j + 2).size(); i++)
@@ -50,10 +54,12 @@ namespace SEALTest
                 }
 
                 keygen.generate_evaluation_keys(2, 1, keys);
+                Assert::AreEqual(keys.decomposition_bit_count(), 2);
                 keys.save(stream);
                 test_keys.load(stream);
                 Assert::AreEqual(keys.size(), test_keys.size());
                 Assert::IsTrue(keys.hash_block() == test_keys.hash_block());
+                Assert::AreEqual(keys.decomposition_bit_count(), test_keys.decomposition_bit_count());
                 for (int j = 0; j < test_keys.size(); j++)
                 {
                     for (int i = 0; i < test_keys.key(j + 2).size(); i++)
@@ -65,10 +71,12 @@ namespace SEALTest
                 }
 
                 keygen.generate_evaluation_keys(59, 2, keys);
+                Assert::AreEqual(keys.decomposition_bit_count(), 59);
                 keys.save(stream);
                 test_keys.load(stream);
                 Assert::AreEqual(keys.size(), test_keys.size());
                 Assert::IsTrue(keys.hash_block() == test_keys.hash_block());
+                Assert::AreEqual(keys.decomposition_bit_count(), test_keys.decomposition_bit_count());
                 for (int j = 0; j < test_keys.size(); j++)
                 {
                     for (int i = 0; i < test_keys.key(j + 2).size(); i++)
@@ -80,10 +88,12 @@ namespace SEALTest
                 }
 
                 keygen.generate_evaluation_keys(60, 5, keys);
+                Assert::AreEqual(keys.decomposition_bit_count(), 60);
                 keys.save(stream);
                 test_keys.load(stream);
                 Assert::AreEqual(keys.size(), test_keys.size());
                 Assert::IsTrue(keys.hash_block() == test_keys.hash_block());
+                Assert::AreEqual(keys.decomposition_bit_count(), test_keys.decomposition_bit_count());
                 for (int j = 0; j < test_keys.size(); j++)
                 {
                     for (int i = 0; i < test_keys.key(j + 2).size(); i++)
@@ -105,17 +115,21 @@ namespace SEALTest
 
                 EvaluationKeys keys;
                 EvaluationKeys test_keys;
+                Assert::AreEqual(keys.decomposition_bit_count(), 0);
                 keys.save(stream);
                 test_keys.load(stream);
                 Assert::AreEqual(keys.size(), test_keys.size());
                 Assert::IsTrue(keys.hash_block() == test_keys.hash_block());
+                Assert::AreEqual(keys.decomposition_bit_count(), test_keys.decomposition_bit_count());
                 Assert::AreEqual(0, keys.size());
 
                 keygen.generate_evaluation_keys(8, 1, keys);
+                Assert::AreEqual(keys.decomposition_bit_count(), 8);
                 keys.save(stream);
                 test_keys.load(stream);
                 Assert::AreEqual(keys.size(), test_keys.size());
                 Assert::IsTrue(keys.hash_block() == test_keys.hash_block());
+                Assert::AreEqual(keys.decomposition_bit_count(), test_keys.decomposition_bit_count());
                 for (int j = 0; j < test_keys.size(); j++)
                 {
                     for (int i = 0; i < test_keys.key(j + 2).size(); i++)
@@ -127,10 +141,12 @@ namespace SEALTest
                 }
 
                 keygen.generate_evaluation_keys(8, 2, keys);
+                Assert::AreEqual(keys.decomposition_bit_count(), 8);
                 keys.save(stream);
                 test_keys.load(stream);
                 Assert::AreEqual(keys.size(), test_keys.size());
                 Assert::IsTrue(keys.hash_block() == test_keys.hash_block());
+                Assert::AreEqual(keys.decomposition_bit_count(), test_keys.decomposition_bit_count());
                 for (int j = 0; j < test_keys.size(); j++)
                 {
                     for (int i = 0; i < test_keys.key(j + 2).size(); i++)
@@ -142,10 +158,12 @@ namespace SEALTest
                 }
 
                 keygen.generate_evaluation_keys(59, 2, keys);
+                Assert::AreEqual(keys.decomposition_bit_count(), 59);
                 keys.save(stream);
                 test_keys.load(stream);
                 Assert::AreEqual(keys.size(), test_keys.size());
                 Assert::IsTrue(keys.hash_block() == test_keys.hash_block());
+                Assert::AreEqual(keys.decomposition_bit_count(), test_keys.decomposition_bit_count());
                 for (int j = 0; j < test_keys.size(); j++)
                 {
                     for (int i = 0; i < test_keys.key(j + 2).size(); i++)
@@ -157,10 +175,12 @@ namespace SEALTest
                 }
 
                 keygen.generate_evaluation_keys(60, 5, keys);
+                Assert::AreEqual(keys.decomposition_bit_count(), 60);
                 keys.save(stream);
                 test_keys.load(stream);
                 Assert::AreEqual(keys.size(), test_keys.size());
                 Assert::IsTrue(keys.hash_block() == test_keys.hash_block());
+                Assert::AreEqual(keys.decomposition_bit_count(), test_keys.decomposition_bit_count());
                 for (int j = 0; j < test_keys.size(); j++)
                 {
                     for (int i = 0; i < test_keys.key(j + 2).size(); i++)

@@ -13,14 +13,19 @@ namespace seal
     */
     struct GaloisKeys::GaloisKeysPrivateHelper
     {
-        static std::vector<std::vector<seal::Ciphertext> > &data(seal::GaloisKeys *evks)
+        static std::vector<std::vector<seal::Ciphertext> > &data(seal::GaloisKeys *galKeys)
         {
-            return evks->mutable_data();
+            return galKeys->mutable_data();
         }
 
-        static seal::EncryptionParameters::hash_block_type &hash_block(seal::GaloisKeys *evks)
+        static int &decomposition_bit_count(seal::GaloisKeys *galKeys)
         {
-            return evks->mutable_hash_block();
+            return galKeys->decomposition_bit_count_;
+        }
+
+        static seal::EncryptionParameters::hash_block_type &hash_block(seal::GaloisKeys *galKeys)
+        {
+            return galKeys->mutable_hash_block();
         }
     };
 }
@@ -208,6 +213,10 @@ namespace Microsoft
                         sizeof(seal::EncryptionParameters::hash_block_type)
                     );
 
+                    // Save the decomposition bit count
+                    int32_t decomposition_bit_count32 = keys_->decomposition_bit_count();
+                    Write(stream, reinterpret_cast<const char*>(&decomposition_bit_count32), sizeof(int32_t));
+
                     auto keysData = Data;
 
                     // Save the size of keys_
@@ -260,6 +269,11 @@ namespace Microsoft
                         reinterpret_cast<char*>(&seal::GaloisKeys::GaloisKeysPrivateHelper::hash_block(keys_)),
                         sizeof(seal::EncryptionParameters::hash_block_type)
                     );
+
+                    // Read the decomposition bit count
+                    int32_t decomposition_bit_count32 = 0;
+                    Read(stream, reinterpret_cast<char*>(&decomposition_bit_count32), sizeof(int32_t));
+                    seal::GaloisKeys::GaloisKeysPrivateHelper::decomposition_bit_count(keys_) = decomposition_bit_count32;
 
                     // Read the size
                     int32_t readSize32 = 0;

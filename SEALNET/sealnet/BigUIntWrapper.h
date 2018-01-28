@@ -891,6 +891,22 @@ namespace Microsoft
                 */
                 void DuplicateFrom(BigUInt ^value);
 
+                /**
+                <summary>Creates a BigUInt initialized and minimally sized to fit the unsigned hexadecimal integer specified
+                by the string.</summary>
+
+                <remarks>
+                Creates a BigUInt initialized and minimally sized to fit the unsigned hexadecimal integer specified by
+                the string. The string matches the format returned by <see cref="ToString()"/> and must consist of only
+                the characters 0-9, A-F, or a-f, most-significant nibble first.
+                </remarks>
+
+                <param name="hexString">The hexadecimal integer string specifying the initial value</param>
+                <exception cref="System::ArgumentNullException">If hexString is null</exception>
+                <exception cref="System::ArgumentException">If hexString does not adhere to the expected format</exception>
+                */
+                static operator BigUInt ^(System::String ^hexString);
+
             internal:
                 /**
                 <summary>Creates a deep copy of a C++ BigUInt.</summary>

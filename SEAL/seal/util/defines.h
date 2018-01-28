@@ -1,16 +1,38 @@
 #pragma once
 
-// Enable extended parameter checks in Visual Studio debug mode
+// SEAL version
+#define SEAL_VERSION_STRING "v2.3.0-4"
+
+// For extended parameter checks compile with -DSEAL_DEBUG in GCC
+// or compile in Debug mode in Visual Studio 
 #if defined(_MSC_VER) && defined(_DEBUG)
 #define SEAL_DEBUG
-#else
-// Define SEAL_DEBUG for debug mode
-#undef SEAL_DEBUG
 #endif
+
+// SEAL checks input argument compatibility and validity using hashes of
+// the encryption parameters. The validity guarantee is implemented by 
+// restricting (direct) access to ciphertext and key data, and to the 
+// hashes that these objects store. This works well when implementing 
+// high-level applications using SEAL, but sometimes is too rigid for 
+// certain lower level applications. SEAL_EXPOSE_MUTABLE_HASH_BLOCK  
+// exposes functions to manually edit the parameter hashes to make the 
+// parameter compatibility checks pass in cases where they normally 
+// should not pass. Please note that it is extremely easy to break 
+// things by doing this, and the consequences can be unexpected.
+//#define SEAL_EXPOSE_MUTABLE_HASH_BLOCK
+
+// Allow ciphertext data to be directly modified by exposing the
+// functions seal::Ciphertext::mutable_pointer(int) and 
+// seal::Ciphertext::set_zero(int) in the public API. Most users should 
+// have no reason to allow this. Another less extreme and recommended 
+// way of mutating ciphertext data is by allocating memory manually, 
+// and using aliased ciphertexts pointing to the allocated memory, 
+// which can then be mutated freely.
+//#define SEAL_EXPOSE_MUTABLE_CIPHERTEXT
 
 // For security reasons one should never throw when decoding fails due
 // to overflow, but in some cases this might help in diagnosing problems.
-#undef SEAL_THROW_ON_DECODER_OVERFLOW
+//#define SEAL_THROW_ON_DECODER_OVERFLOW
 
 // Multiplication by a plaintext zero should not be allowed, and by
 // default SEAL throws an error in this case. For performance reasons
@@ -18,11 +40,8 @@
 // elsewhere.
 #define SEAL_THROW_ON_MULTIPLY_PLAIN_BY_ZERO
 
-// Use unrolled versions of polynomial operations for automatic vectorization
-#undef SEAL_VECTORIZATION_HINTS
-
 // Compile for big-endian system (not implemented)
-#undef SEAL_BIG_ENDIAN
+//#define SEAL_BIG_ENDIAN
 
 // Bound on the bit-length of user-defined moduli
 #define SEAL_USER_MODULO_BIT_BOUND 60
@@ -39,6 +58,10 @@
 // Debugging help
 #define SEAL_ASSERT(condition) { if(!(condition)){ std::cerr << "ASSERT FAILED: "   \
     << #condition << " @ " << __FILE__ << " (" << __LINE__ << ")" << std::endl; } }
+
+// String expansion 
+#define SEAL_STR(x) #x
+#define SEAL_STRX(x) SEAL_STR(x)
 
 // Microsoft Visual Studio 2012 or newer
 #if (_MSC_VER >= 1700)
@@ -83,21 +106,19 @@
         reinterpret_cast<unsigned long long*>(hw64));                               \
 }
 #endif
-
 #else //_M_X64
-
 #undef SEAL_ENABLE_INTRIN
-
 #endif //_M_X64
 
 #endif //_MSC_VER
 
 
 // GNU GCC/G++
-#if defined(__GNUC__) && (__GNUC__ < 6)
-#error "SEAL requires #__GNUC__ >= 6 (currently using __GNUC__)"
+#if defined(__GNUC__) && (__GNUC__ < 5)
+#error "SEAL requires __GNUC__ >= 5" 
 #endif
-#if (__GNUC__ >= 6) && defined(__cplusplus)
+
+#if (__GNUC__ >= 5) && defined(__cplusplus)
 
 // Read in config.h to disable unavailable intrinsics
 #ifdef HAVE_CONFIG_H
@@ -138,17 +159,26 @@
 #endif //SEAL_ENABLE__ADDCARRY_U64
 
 #ifdef SEAL_ENABLE__SUBBORROW_U64
+#if (__GNUC__ == 7) && (__GNUC_MINOR__ >= 2)
+// The inverted arguments problem was fixed in GCC-7.2 
+// (https://patchwork.ozlabs.org/patch/784309/)
+#define SEAL_SUB_BORROW_UINT64(operand1, operand2, borrow, result) _subborrow_u64(  \
+    borrow,                                                                         \
+    static_cast<unsigned long long>(operand1),                                      \
+    static_cast<unsigned long long>(operand2),                                      \
+    reinterpret_cast<unsigned long long*>(result))
+#else
 // Warning: Note the inverted order of operand1 and operand2
 #define SEAL_SUB_BORROW_UINT64(operand1, operand2, borrow, result) _subborrow_u64(  \
     borrow,                                                                         \
     static_cast<unsigned long long>(operand2),                                      \
     static_cast<unsigned long long>(operand1),                                      \
     reinterpret_cast<unsigned long long*>(result))
+#endif //(__GNUC__ == 7) && (__GNUC_MINOR__ >= 2)
 #endif //SEAL_ENABLE__SUBBORROW_U64
 
 #endif //SEAL_ENABLE_INTRIN
-
-#endif //defined(__GNUC__ >= 6) && defined(__cplusplus)
+#endif //defined(__GNUC__ >= 5) && defined(__cplusplus)
 
 // Use generic functions as (slower) fallback
 #ifndef SEAL_ADD_CARRY_UINT64
