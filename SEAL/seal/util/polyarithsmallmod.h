@@ -246,18 +246,47 @@ namespace seal
                 throw std::invalid_argument("modulus");
             }
 #endif
-            Pointer intermediate(allocate_uint(coeff_count, pool));
-            for (int i = 0; i < coeff_count - 1; i++)
-            {
-                int i_shift = i + mono_power;
-                if (i_shift >= (coeff_count - 1))  {
-                    intermediate[i_shift - (coeff_count - 1)] = multiply_uint_uint_mod(poly[i], modulus.value() - mono_coeff, modulus);
-                } else {
-                    intermediate[i_shift] = multiply_uint_uint_mod(poly[i], mono_coeff, modulus);
+            Pointer intermediate(allocate_uint(coeff_count - 1, pool));
+            const std::uint64_t modulus_value = modulus.value();
+            if (mono_coeff == 1) {
+                for (int i = 0; i < coeff_count - 1; i++)
+                {
+                    int i_shift = i + mono_power;
+                    std::uint64_t result_value = *poly++;
+                    if (i_shift >= (coeff_count - 1))  {
+//                        intermediate[i_shift - (coeff_count - 1)] = negate_uint_mod(poly[i], modulus);
+                        std::int64_t non_zero = (result_value != 0);
+                        intermediate[i_shift - (coeff_count - 1)] = (modulus_value - result_value) & static_cast<std::uint64_t>(-non_zero);
+                    } else {
+                        intermediate[i_shift] = result_value;
+                    }
+                }
+            } else if (mono_coeff == modulus.value() - 1) {
+                for (int i = 0; i < coeff_count - 1; i++)
+                {
+                    int i_shift = i + mono_power;
+                    std::uint64_t result_value = *poly++;
+                    if (i_shift >= (coeff_count - 1))  {
+                        intermediate[i_shift - (coeff_count - 1)] = result_value;
+                    } else {
+//                        intermediate[i_shift] = negate_uint_mod(poly[i], modulus);
+                        std::int64_t non_zero = (result_value != 0);
+                        intermediate[i_shift] = (modulus_value - result_value) & static_cast<std::uint64_t>(-non_zero);
+
+                    }
+                }
+            } else {
+                for (int i = 0; i < coeff_count - 1; i++)
+                {
+                    int i_shift = i + mono_power;
+                    if (i_shift >= (coeff_count - 1))  {
+                        intermediate[i_shift - (coeff_count - 1)] = multiply_uint_uint_mod(poly[i], modulus.value() - mono_coeff, modulus);
+                    } else {
+                        intermediate[i_shift] = multiply_uint_uint_mod(poly[i], mono_coeff, modulus);
+                    }
                 }
             }
-            intermediate[coeff_count - 1] = poly[coeff_count - 1];
-            set_uint_uint(intermediate.get(), coeff_count, result);
+            set_uint_uint(intermediate.get(), coeff_count - 1, result);
         }
 
         void multiply_poly_poly_coeffmod(const std::uint64_t *operand1, int operand1_coeff_count,
