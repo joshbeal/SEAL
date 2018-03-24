@@ -9,6 +9,8 @@
 #define SEAL_DEBUG
 #endif
 
+//#define SEAL_ENABLE_SIMD_NTT
+
 // SEAL checks input argument compatibility and validity using hashes of
 // the encryption parameters. The validity guarantee is implemented by 
 // restricting (direct) access to ciphertext and key data, and to the 

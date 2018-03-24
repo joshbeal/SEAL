@@ -199,9 +199,10 @@ namespace seal
         */
         void ntt_negacyclic_harvey_lazy(uint64_t *operand, const SmallNTTTables &tables)
         {
+#ifdef SEAL_ENABLE_SIMD_NTT
             uint64_t modulus = tables.modulus().value();
             uint64_t two_times_modulus = modulus * 2;
-            
+
             // Return the NTT in scrambled order
             int n = 1 << tables.coeff_count_power();
             int t = n >> 1;
@@ -220,6 +221,140 @@ namespace seal
                         uint64_t *Y = X + t;
                         uint64_t currX;
                         uint64_t Q;
+                        uint64_t operand1, operand2, operand1_coeff_right, operand2_coeff_right;
+                        uint64_t middle1, middle, left, right, temp_sum;
+                        for (int j = j1; j < j2; j += 4)
+                        {
+                            currX = *X - (two_times_modulus & static_cast<uint64_t>(-static_cast<int64_t>(*X >= two_times_modulus)));
+
+                            operand1 = Wprime;
+                            operand2 = *Y;
+                            operand1_coeff_right = operand1 & 0x00000000FFFFFFFF;
+                            operand2_coeff_right = operand2 & 0x00000000FFFFFFFF;
+                            operand1 >>= 32;
+                            operand2 >>= 32;
+                            middle1 = operand1 * operand2_coeff_right;
+                            middle1 += (operand2 * operand1_coeff_right);
+                            middle = middle1;
+                            left = operand1 * operand2 + (static_cast<uint64_t>((middle1 < (operand2 * operand1_coeff_right)) || (~middle1 < 0)) << 32);
+                            right = operand1_coeff_right * operand2_coeff_right;
+                            temp_sum = (right >> 32) + (middle & 0x00000000FFFFFFFF);
+                            Q = left + (middle >> 32) + (temp_sum >> 32);
+
+                            Q = *Y * W - Q * modulus;
+                            *X++ = currX + Q;
+                            *Y++ = currX + (two_times_modulus - Q);
+
+                            currX = *X - (two_times_modulus & static_cast<uint64_t>(-static_cast<int64_t>(*X >= two_times_modulus)));
+
+                            operand1 = Wprime;
+                            operand2 = *Y;
+                            operand1_coeff_right = operand1 & 0x00000000FFFFFFFF;
+                            operand2_coeff_right = operand2 & 0x00000000FFFFFFFF;
+                            operand1 >>= 32;
+                            operand2 >>= 32;
+                            middle1 = operand1 * operand2_coeff_right;
+                            middle1 += (operand2 * operand1_coeff_right);
+                            middle = middle1;
+                            left = operand1 * operand2 + (static_cast<uint64_t>((middle1 < (operand2 * operand1_coeff_right)) || (~middle1 < 0)) << 32);           right = operand1_coeff_right * operand2_coeff_right;
+                            temp_sum = (right >> 32) + (middle & 0x00000000FFFFFFFF);
+                            Q = left + (middle >> 32) + (temp_sum >> 32);
+
+                            Q = *Y * W - Q * modulus;
+                            *X++ = currX + Q;
+                            *Y++ = currX + (two_times_modulus - Q);
+
+                            currX = *X - (two_times_modulus & static_cast<uint64_t>(-static_cast<int64_t>(*X >= two_times_modulus)));
+
+                            operand1 = Wprime;
+                            operand2 = *Y;
+                            operand1_coeff_right = operand1 & 0x00000000FFFFFFFF;
+                            operand2_coeff_right = operand2 & 0x00000000FFFFFFFF;
+                            operand1 >>= 32;
+                            operand2 >>= 32;
+                            middle1 = operand1 * operand2_coeff_right;
+                            middle1 += (operand2 * operand1_coeff_right);
+                            middle = middle1;
+                            left = operand1 * operand2 + (static_cast<uint64_t>((middle1 < (operand2 * operand1_coeff_right)) || (~middle1 < 0)) << 32);                     right = operand1_coeff_right * operand2_coeff_right;
+                            temp_sum = (right >> 32) + (middle & 0x00000000FFFFFFFF);
+                            Q = left + (middle >> 32) + (temp_sum >> 32);
+
+                            Q = *Y * W - Q * modulus;
+                            *X++ = currX + Q;
+                            *Y++ = currX + (two_times_modulus - Q);
+
+                            currX = *X - (two_times_modulus & static_cast<uint64_t>(-static_cast<int64_t>(*X >= two_times_modulus)));
+
+                            operand1 = Wprime;
+                            operand2 = *Y;
+                            operand1_coeff_right = operand1 & 0x00000000FFFFFFFF;
+                            operand2_coeff_right = operand2 & 0x00000000FFFFFFFF;
+                            operand1 >>= 32;
+                            operand2 >>= 32;
+                            middle1 = operand1 * operand2_coeff_right;
+                            middle1 += (operand2 * operand1_coeff_right);
+                            middle = middle1;
+                            left = operand1 * operand2 + (static_cast<uint64_t>((middle1 < (operand2 * operand1_coeff_right)) || (~middle1 < 0)) << 32);                    right = operand1_coeff_right * operand2_coeff_right;
+                            temp_sum = (right >> 32) + (middle & 0x00000000FFFFFFFF);
+                            Q = left + (middle >> 32) + (temp_sum >> 32);
+
+                            Q = *Y * W - Q * modulus;
+                            *X++ = currX + Q;
+                            *Y++ = currX + (two_times_modulus - Q);
+                        }
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < m; i++)
+                    {
+                        int j1 = 2 * i * t;
+                        int j2 = j1 + t;
+                        const uint64_t W = tables.get_from_root_powers(m + i);
+                        const uint64_t Wprime = tables.get_from_scaled_root_powers(m + i);
+
+                        uint64_t *X = operand + j1;
+                        uint64_t *Y = X + t;
+                        uint64_t currX;
+                        uint64_t Q;
+                        for (int j = j1; j < j2; j++)
+                        {
+                            // The Harvey butterfly: assume X, Y in [0, 2p), and return X', Y' in [0, 2p).
+                            // X', Y' = X + WY, X - WY (mod p).
+                            currX = *X - (two_times_modulus & static_cast<uint64_t>(-static_cast<int64_t>(*X >= two_times_modulus)));
+                            multiply_uint64_hw64(Wprime, *Y, &Q);
+                            Q = W * *Y - Q * modulus;
+                            *X++ = currX + Q;
+                            *Y++ = currX + (two_times_modulus - Q);
+                        }
+                    }
+                }
+                t >>= 1;
+            }
+#else
+            uint64_t modulus = tables.modulus().value();
+            uint64_t two_times_modulus = modulus * 2;
+
+            // Return the NTT in scrambled order
+            int n = 1 << tables.coeff_count_power();
+            int t = n >> 1;
+            for (int m = 1; m < n; m <<= 1)
+            {
+                if (t >= 4)
+                {
+                    for (int i = 0; i < m; i++)
+                    {
+                        int j1 = 2 * i * t;
+                        int j2 = j1 + t;
+                        const uint64_t W = tables.get_from_root_powers(m + i);
+                        const uint64_t Wprime = tables.get_from_scaled_root_powers(m + i);
+
+                        uint64_t *X = operand + j1;
+                        uint64_t *Y = X + t;
+                        uint64_t currX;
+                        uint64_t Q;
+                        uint64_t operand1, operand2, operand1_coeff_right, operand2_coeff_right;
+                        uint64_t middle1, middle, left, right, temp_sum;
                         for (int j = j1; j < j2; j += 4)
                         {
                             currX = *X - (two_times_modulus & static_cast<uint64_t>(-static_cast<int64_t>(*X >= two_times_modulus)));
@@ -275,15 +410,174 @@ namespace seal
                 }
                 t >>= 1;
             }
+#endif
         }
 
         // Inverse negacyclic NTT using Harvey's butterfly. (See Patrick Longa and Michael Naehrig). 
         void inverse_ntt_negacyclic_harvey_lazy(uint64_t *operand, const SmallNTTTables &tables)
         {
+#ifdef SEAL_ENABLE_SIMD_NTT
             uint64_t modulus = tables.modulus().value();
             uint64_t two_times_modulus = modulus * 2;
 
             // return the bit-reversed order of NTT. 
+            int n = 1 << tables.coeff_count_power();
+            int t = 1;
+
+            for (int m = n; m > 1; m >>= 1)
+            {
+                int j1 = 0;
+                int h = m >> 1;
+                if (t >= 4)
+                {
+                    for (int i = 0; i < h; i++)
+                    {
+                        int j2 = j1 + t;
+                        // Need the powers of phi^{-1} in bit-reversed order
+                        const uint64_t W = tables.get_from_inv_root_powers_div_two(h + i);
+                        const uint64_t Wprime = tables.get_from_scaled_inv_root_powers_div_two(h + i);
+
+                        uint64_t *U = operand + j1;
+                        uint64_t *V = U + t;
+                        uint64_t currU;
+                        uint64_t T;
+                        uint64_t H;
+                        uint64_t operand1, operand2, operand1_coeff_right, operand2_coeff_right;
+                        uint64_t middle1, middle, left, right, temp_sum;
+                        for (int j = j1; j < j2; j += 4)
+                        {
+                            T = two_times_modulus - *V + *U;
+                            currU = *U + *V - (two_times_modulus & static_cast<uint64_t>(-static_cast<int64_t>((*U << 1) >= T)));
+                            *U++ = (currU + (modulus & static_cast<uint64_t>(-static_cast<int64_t>(T & 1)))) >> 1;
+
+                            operand1 = Wprime;
+                            operand2 = T;
+                            operand1_coeff_right = operand1 & 0x00000000FFFFFFFF;
+                            operand2_coeff_right = operand2 & 0x00000000FFFFFFFF;
+                            operand1 >>= 32;
+                            operand2 >>= 32;
+                            middle1 = operand1 * operand2_coeff_right;
+                            middle1 += (operand2 * operand1_coeff_right);
+                            middle = middle1;
+                            left = operand1 * operand2 + (static_cast<uint64_t>((middle1 < (operand2 * operand1_coeff_right)) || (~middle1 < 0)) << 32);
+                            right = operand1_coeff_right * operand2_coeff_right;
+                            temp_sum = (right >> 32) + (middle & 0x00000000FFFFFFFF);
+                            H = left + (middle >> 32) + (temp_sum >> 32);
+
+                            *V++ = T * W - H * modulus;
+
+                            T = two_times_modulus - *V + *U;
+                            currU = *U + *V - (two_times_modulus & static_cast<uint64_t>(-static_cast<int64_t>((*U << 1) >= T)));
+                            *U++ = (currU + (modulus & static_cast<uint64_t>(-static_cast<int64_t>(T & 1)))) >> 1;
+
+                            operand1 = Wprime;
+                            operand2 = T;
+                            operand1_coeff_right = operand1 & 0x00000000FFFFFFFF;
+                            operand2_coeff_right = operand2 & 0x00000000FFFFFFFF;
+                            operand1 >>= 32;
+                            operand2 >>= 32;
+                            middle1 = operand1 * operand2_coeff_right;
+                            middle1 += (operand2 * operand1_coeff_right);
+                            middle = middle1;
+                            left = operand1 * operand2 + (static_cast<uint64_t>((middle1 < (operand2 * operand1_coeff_right)) || (~middle1 < 0)) << 32);
+                            right = operand1_coeff_right * operand2_coeff_right;
+                            temp_sum = (right >> 32) + (middle & 0x00000000FFFFFFFF);
+                            H = left + (middle >> 32) + (temp_sum >> 32);
+
+                            *V++ = T * W - H * modulus;
+
+                            T = two_times_modulus - *V + *U;
+                            currU = *U + *V - (two_times_modulus & static_cast<uint64_t>(-static_cast<int64_t>((*U << 1) >= T)));
+                            *U++ = (currU + (modulus & static_cast<uint64_t>(-static_cast<int64_t>(T & 1)))) >> 1;
+
+                            operand1 = Wprime;
+                            operand2 = T;
+                            operand1_coeff_right = operand1 & 0x00000000FFFFFFFF;
+                            operand2_coeff_right = operand2 & 0x00000000FFFFFFFF;
+                            operand1 >>= 32;
+                            operand2 >>= 32;
+                            middle1 = operand1 * operand2_coeff_right;
+                            middle1 += (operand2 * operand1_coeff_right);
+                            middle = middle1;
+                            left = operand1 * operand2 + (static_cast<uint64_t>((middle1 < (operand2 * operand1_coeff_right)) || (~middle1 < 0)) << 32);
+                            right = operand1_coeff_right * operand2_coeff_right;
+                            temp_sum = (right >> 32) + (middle & 0x00000000FFFFFFFF);
+                            H = left + (middle >> 32) + (temp_sum >> 32);
+
+                            *V++ = T * W - H * modulus;
+
+                            T = two_times_modulus - *V + *U;
+                            currU = *U + *V - (two_times_modulus & static_cast<uint64_t>(-static_cast<int64_t>((*U << 1) >= T)));
+                            *U++ = (currU + (modulus & static_cast<uint64_t>(-static_cast<int64_t>(T & 1)))) >> 1;
+
+                            operand1 = Wprime;
+                            operand2 = T;
+                            operand1_coeff_right = operand1 & 0x00000000FFFFFFFF;
+                            operand2_coeff_right = operand2 & 0x00000000FFFFFFFF;
+                            operand1 >>= 32;
+                            operand2 >>= 32;
+                            middle1 = operand1 * operand2_coeff_right;
+                            middle1 += (operand2 * operand1_coeff_right);
+                            middle = middle1;
+                            left = operand1 * operand2 + (static_cast<uint64_t>((middle1 < (operand2 * operand1_coeff_right)) || (~middle1 < 0)) << 32);
+                            right = operand1_coeff_right * operand2_coeff_right;
+                            temp_sum = (right >> 32) + (middle & 0x00000000FFFFFFFF);
+                            H = left + (middle >> 32) + (temp_sum >> 32);
+
+                            *V++ = T * W - H * modulus;
+                        }
+                        j1 += (t << 1);
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < h; i++)
+                    {
+                        int j2 = j1 + t;
+                        // Need the powers of  phi^{-1} in bit-reversed order
+                        const uint64_t W = tables.get_from_inv_root_powers_div_two(h + i);
+                        const uint64_t Wprime = tables.get_from_scaled_inv_root_powers_div_two(h + i);
+
+                        uint64_t *U = operand + j1;
+                        uint64_t *V = U + t;
+                        uint64_t currU;
+                        uint64_t T;
+                        uint64_t H;
+                        for (int j = j1; j < j2; j++)
+                        {
+                            currU = *U;
+                            // U = x[i], V = x[i+m]
+
+                            // Compute U - V + 2q
+                            T = two_times_modulus - *V + *U;
+
+                            // Cleverly check whether currU + currV >= two_times_modulus
+                            currU = *U + *V - (two_times_modulus & static_cast<uint64_t>(-static_cast<int64_t>((*U << 1) >= T)));
+
+                            // Need to make it so that div2_uint_mod takes values that are > q. 
+                            //div2_uint_mod(U, modulusptr, coeff_uint64_count, U); 
+                            // We use also the fact that parity of currU is same as parity of T.
+                            // Since our modulus is always so small that currU + masked_modulus < 2^64,
+                            // we never need to worry about wrapping around when adding masked_modulus.
+                            //uint64_t masked_modulus = modulus & static_cast<uint64_t>(-static_cast<int64_t>(T & 1));
+                            //uint64_t carry = add_uint64(currU, masked_modulus, 0, &currU);
+                            //currU += modulus & static_cast<uint64_t>(-static_cast<int64_t>(T & 1));
+                            *U++ = (currU + (modulus & static_cast<uint64_t>(-static_cast<int64_t>(T & 1)))) >> 1;
+
+                            multiply_uint64_hw64(Wprime, T, &H);
+                            // effectively, the next two multiply perform multiply modulo beta = 2**wordsize. 
+                            *V++ = W * T - H * modulus;
+                        }
+                        j1 += (t << 1);
+                    }
+                }
+                t <<= 1;
+            }
+#else
+            uint64_t modulus = tables.modulus().value();
+            uint64_t two_times_modulus = modulus * 2;
+
+            // return the bit-reversed order of NTT.
             int n = 1 << tables.coeff_count_power();
             int t = 1;
 
@@ -378,6 +672,7 @@ namespace seal
                 }
                 t <<= 1;
             }
+#endif
         }
     }
 }
